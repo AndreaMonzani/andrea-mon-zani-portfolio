@@ -5,78 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Andrea Monzani — Post-produzione & Produzione, Milano</title>
   <meta name="description" content="Andrea Monzani, postproducer e producer a Milano. Montaggio, color, sound e produzione per agenzie e case di produzione.">
-  <meta property="og:title" content="Andrea Monzani — Post-produzione & Produzione">
-  <meta property="og:description" content="Postproduzione e produzione per agenzie e case di produzione. Milano e oltre.">
-  <meta property="og:type" content="website">
   <meta name="theme-color" content="#0B0B0C">
-  <script>
-    if (navigator.language && navigator.language.toLowerCase().indexOf('it') !== 0) {
-      document.documentElement.classList.add('lang-en');
-      document.documentElement.setAttribute('lang', 'en');
-    }
-  </script>
   <link rel="preconnect" href="https://api.fontshare.com">
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles/main.css?v=6">
-  <script src="scripts/main.js?v=6" defer></script>
+  <link rel="stylesheet" href="./styles/main-2.css?v=24">
+  <script src="./scripts/main-3.js?v=24" defer></script>
 </head>
 <body>
-  <a class="skip-link" href="#main"><span class="it">Vai al contenuto</span><span class="en">Skip to content</span></a>
-
+  <a class="skip-link" href="#main">Vai al contenuto</a>
   <div class="grain" aria-hidden="true"></div>
-
-  <div class="cursor" aria-hidden="true">
-    <div class="cursor-ring"></div>
-    <div class="cursor-dot"></div>
-    <div class="cursor-label"><span class="it">Riproduci</span><span class="en">Play</span></div>
-  </div>
-
-  <div class="intro" id="intro">
-    <div class="intro-badge" aria-hidden="true">
-      <div class="intro-badge-glow"></div>
-
-      <svg class="intro-scope" viewBox="0 0 200 200" aria-hidden="true">
-        <circle class="scope-ring" cx="100" cy="100" r="86"></circle>
-        <circle class="scope-ring scope-ring--inner" cx="100" cy="100" r="64"></circle>
-        <circle class="scope-ring scope-ring--micro" cx="100" cy="100" r="3"></circle>
-        <line class="scope-tick" x1="100" y1="4" x2="100" y2="22"></line>
-        <line class="scope-tick" x1="196" y1="100" x2="178" y2="100"></line>
-        <line class="scope-tick" x1="100" y1="196" x2="100" y2="178"></line>
-        <line class="scope-tick" x1="4" y1="100" x2="22" y2="100"></line>
-        <line class="scope-wiper" x1="100" y1="100" x2="100" y2="18"></line>
-      </svg>
-
-      <div class="intro-disc">
-        <img class="intro-logo" src="assets/logo-intro.png" alt="">
-      </div>
-    </div>
-
-    <button class="intro-skip" id="introSkip" type="button">
-      <span class="it">Salta intro</span><span class="en">Skip intro</span>
-    </button>
-  </div>
 
   <header class="site-header">
     <a class="logo-mark" href="#top" aria-label="Andrea Monzani Home">
       <svg viewBox="0 0 32 32" aria-hidden="true">
-        <circle cx="16" cy="16" r="15" fill="none" stroke="currentColor" stroke-width="1"></circle>
+        <circle cx="16" cy="16" r="15" fill="none" stroke="currentColor"></circle>
         <circle cx="16" cy="16" r="2" fill="currentColor"></circle>
       </svg>
-      Andrea Monzani
+      <span>Andrea Monzani</span>
     </a>
 
-    <nav class="header-nav" aria-label="Lingua e contatti">
-      <button class="lang-switch" data-lang="it" aria-pressed="true" type="button">IT</button>
-      <span class="nav-sep">/</span>
-      <button class="lang-switch" data-lang="en" aria-pressed="false" type="button">EN</button>
-      <a class="nav-cta" href="#contatti"><span class="it">Contatti</span><span class="en">Contact</span></a>
+    <nav class="header-nav" aria-label="Navigazione principale">
+      <a href="#lavori">Works</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#contatti">Contact</a>
     </nav>
   </header>
 
   <main id="main">
-    <section class="hero hero-glow" id="top">
-      <div class="hero-glow-orbit hero-glow-orbit-a" aria-hidden="true"></div>
-      <div class="hero-glow-orbit hero-glow-orbit-b" aria-hidden="true"></div>
+    <section class="hero" id="top">
+      <div class="hero-content">
+        <p class="eyebrow">Post-produzione & Produzione · Milano</p>
+        <h1>Il ritmo nascosto nel montaggio.</h1>
+        <p class="hero-sub">Post-produzione e produzione per advertising, branded content e progetti video.</p>
+      </div>
 
       <div class="hero-media" aria-hidden="true">
         <div class="hero-media-plate">
@@ -86,103 +47,90 @@
         </div>
         <div class="hero-media-frame"></div>
       </div>
-
-      <div class="hero-content">
-        <span class="eyebrow"><span class="it">Andrea Monzani — Post-produzione & Produzione, Milano</span><span class="en">Andrea Monzani — Post-production & Producing, Milan</span></span>
-        <h1>
-          <span class="it">Il ritmo</span><span class="en">The rhythm</span><br>
-          <span class="it">nascosto nel</span><span class="en">hidden in</span><br>
-          <span class="it">montaggio.</span><span class="en">the edit.</span>
-        </h1>
-        <p class="hero-sub"><span class="it">Post-produzione e produzione per advertising, branded content e progetti video. Milano e oltre.</span><span class="en">Post-production and producing for advertising, branded content and video projects. Milan and beyond.</span></p>
-      </div>
-
-      <div class="scroll-cue" aria-hidden="true">
-        <div class="scroll-cue-line"></div>
-        <span class="it">Scorri</span><span class="en">Scroll</span>
-      </div>
     </section>
 
     <section class="showreel">
-      <button class="showreel-trigger" data-video="" data-title="Showreel" type="button">
-        <span class="it">Guarda la Showreel</span><span class="en">Watch the Showreel</span>
+      <button class="showreel-trigger" data-video="xW-SF5DesHI" data-title="My Name Is My Story | Told by Spike Lee" type="button">
+        Guarda la Showreel
         <span class="showreel-ring" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+          <svg viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"></path>
+          </svg>
         </span>
       </button>
     </section>
 
     <section class="works" id="lavori" data-reveal>
       <div class="section-head">
-        <h2><span class="it">Lavori selezionati</span><span class="en">Selected works</span></h2>
-        <p><span class="it">Una selezione, non un archivio.</span><span class="en">A selection, not an archive.</span></p>
+        <h2>Lavori selezionati</h2>
+        <p>Una selezione, non un archivio.</p>
       </div>
 
       <div class="works-grid">
-        <article class="work-card" data-video="" data-title="Adidas Predator — Di Marco" tabindex="0" role="button" aria-label="Apri video Adidas Predator Di Marco">
-          <div class="work-thumb" style="background-image:url('assets/works/adidas-dimarco-thumb.png');"></div>
+        <article class="work-card" data-video="fQ2Xuzze6HU" data-title="Adidas Predator — Di Marco" tabindex="0" role="button" aria-label="Apri video Adidas Predator Di Marco">
+          <div class="work-thumb thumb-1" data-thumb="adidas-dimarco-thumb.png"></div>
           <div class="work-logo">ADIDAS</div>
           <div class="work-meta">
-            <h3><span class="it">Predator — Di Marco</span><span class="en">Predator — Di Marco</span></h3>
-            <p><span class="it">Adidas</span><span class="en">Adidas</span></p>
+            <h3>Predator — Di Marco</h3>
+            <p>Adidas · 2025</p>
           </div>
         </article>
 
-        <article class="work-card" data-video="" data-title="Adidas Predator — Camarda" tabindex="0" role="button" aria-label="Apri video Adidas Predator Camarda">
-          <div class="work-thumb" style="background-image:url('assets/works/adidas-camarda-thumb.png');"></div>
+        <article class="work-card" data-video="To4Y6GsHbw0" data-title="Adidas Predator — Camarda" tabindex="0" role="button" aria-label="Apri video Adidas Predator Camarda">
+          <div class="work-thumb thumb-2" data-thumb="adidas-camarda-thumb.png"></div>
           <div class="work-logo">ADIDAS</div>
           <div class="work-meta">
-            <h3><span class="it">Predator — Camarda</span><span class="en">Predator — Camarda</span></h3>
-            <p><span class="it">Adidas</span><span class="en">Adidas</span></p>
+            <h3>Predator — Camarda</h3>
+            <p>Adidas · 2025</p>
           </div>
         </article>
 
-        <article class="work-card" data-video="" data-title="DAZN — My Club Pass" tabindex="0" role="button" aria-label="Apri video DAZN My Club Pass">
-          <div class="work-thumb" style="background-image:url('assets/works/dazn-thumb.png');"></div>
+        <article class="work-card" data-video="8i8Povpc_7E" data-title="DAZN — My Club Pass ADV" tabindex="0" role="button" aria-label="Apri video DAZN My Club Pass">
+          <div class="work-thumb thumb-3" data-thumb="dazn-thumb.png"></div>
           <div class="work-logo">DAZN</div>
           <div class="work-meta">
-            <h3><span class="it">My Club Pass</span><span class="en">My Club Pass</span></h3>
-            <p><span class="it">DAZN</span><span class="en">DAZN</span></p>
+            <h3>My Club Pass ADV</h3>
+            <p>DAZN · 2025</p>
           </div>
         </article>
 
-        <article class="work-card" data-video="" data-title="Inter x Spike Lee" tabindex="0" role="button" aria-label="Apri video Inter Spike Lee">
-          <div class="work-thumb" style="background-image:url('assets/works/inter-thumb.png');"></div>
+        <article class="work-card" data-video="xW-SF5DesHI" data-title="Inter — My Name Is My Story | Told by Spike Lee" tabindex="0" role="button" aria-label="Apri video Inter My Name Is My Story">
+          <div class="work-thumb thumb-4" data-thumb="inter-thumb.png"></div>
           <div class="work-logo">INTER</div>
           <div class="work-meta">
-            <h3><span class="it">Inter x Spike Lee</span><span class="en">Inter x Spike Lee</span></h3>
-            <p><span class="it">Inter</span><span class="en">Inter</span></p>
+            <h3>My Name Is My Story</h3>
+            <p>Inter · 2025</p>
           </div>
         </article>
 
-        <article class="work-card" data-video="" data-title="Cisalfa — Back to School" tabindex="0" role="button" aria-label="Apri video Cisalfa Back to School">
-          <div class="work-thumb" style="background-image:url('assets/works/cisalfa-thumb.png');"></div>
+        <article class="work-card" data-video="zXo8YhNd9tQ" data-title="Cisalfa — Back To School" tabindex="0" role="button" aria-label="Apri video Cisalfa Back To School">
+          <div class="work-thumb thumb-5" data-thumb="cisalfa-thumb.png"></div>
           <div class="work-logo">CISALFA</div>
           <div class="work-meta">
-            <h3><span class="it">Back to School</span><span class="en">Back to School</span></h3>
-            <p><span class="it">Cisalfa</span><span class="en">Cisalfa</span></p>
+            <h3>Back To School</h3>
+            <p>Cisalfa · 2025</p>
           </div>
         </article>
 
-        <article class="work-card" data-video="" data-title="Maserati — Grecale" tabindex="0" role="button" aria-label="Apri video Maserati Grecale">
-          <div class="work-thumb" style="background-image:url('assets/works/maserati-thumb.png');"></div>
+        <article class="work-card" data-video="DZPRdzIKZgY" data-title="Maserati — Grecale ADV" tabindex="0" role="button" aria-label="Apri video Maserati Grecale ADV">
+          <div class="work-thumb thumb-6" data-thumb="maserati-thumb.png"></div>
           <div class="work-logo">MASERATI</div>
           <div class="work-meta">
-            <h3><span class="it">Grecale</span><span class="en">Grecale</span></h3>
-            <p><span class="it">Maserati</span><span class="en">Maserati</span></p>
+            <h3>Grecale ADV</h3>
+            <p>Maserati · 2025</p>
           </div>
         </article>
       </div>
     </section>
 
-    <section class="workflow workflow-cinematic" data-reveal id="workflow">
+    <section class="workflow" id="workflow" data-reveal>
       <div class="section-head workflow-head">
         <div>
-          <h2><span class="it">Come lavoro</span><span class="en">How I work</span></h2>
-          <p><span class="it">Un processo costruito per dare forma, ritmo e finalità a ogni progetto.</span><span class="en">A process built to shape, pace and purpose every project.</span></p>
+          <h2>Come lavoro</h2>
+          <p>Un processo costruito per dare forma, ritmo e finalità a ogni progetto.</p>
         </div>
         <div class="workflow-kicker">
-          <span><span class="it">Processo</span><span class="en">Process</span></span>
+          <span>Processo</span>
           <strong>05</strong>
         </div>
       </div>
@@ -197,134 +145,121 @@
         <ol class="timeline timeline-cinematic">
           <li class="timeline-step timeline-step-left" data-step="1">
             <div class="timeline-node" aria-hidden="true">
-              <span class="timeline-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 7h16M7 4v6M17 4v6M6 20l4-4 3 2 5-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </span>
+              <span class="timeline-icon">01</span>
               <span class="timeline-ping"></span>
             </div>
             <div class="timeline-card">
               <span class="timeline-label">01</span>
-              <h3><span class="it">Concept & Producing</span><span class="en">Concept & Producing</span></h3>
-              <p><span class="it">Brief, visione, organizzazione e coordinamento. Il progetto prende una direzione chiara prima ancora di entrare in macchina.</span><span class="en">Brief, vision, organization and coordination. The project gets a clear direction before it even enters the machine.</span></p>
+              <h3>Concept & Producing</h3>
+              <p>Brief, visione, organizzazione e coordinamento.</p>
             </div>
           </li>
-
           <li class="timeline-step timeline-step-right" data-step="2">
             <div class="timeline-node" aria-hidden="true">
-              <span class="timeline-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 7h16M7 7v10M17 7v10M9 11l6 2-6 2z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </span>
+              <span class="timeline-icon">02</span>
               <span class="timeline-ping"></span>
             </div>
             <div class="timeline-card">
               <span class="timeline-label">02</span>
-              <h3><span class="it">Montaggio</span><span class="en">Editing</span></h3>
-              <p><span class="it">Struttura, ritmo e tensione narrativa. Qui il materiale trova finalmente la sua forma più precisa.</span><span class="en">Structure, pacing and narrative tension. This is where the footage finds its sharpest form.</span></p>
+              <h3>Montaggio</h3>
+              <p>Struttura, ritmo e tensione narrativa.</p>
             </div>
           </li>
-
           <li class="timeline-step timeline-step-left" data-step="3">
             <div class="timeline-node" aria-hidden="true">
-              <span class="timeline-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 3c3 3 5 5.6 5 8.4A5 5 0 0 1 7 11.4C7 8.6 9 6 12 3Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M8 18c1.2 1 2.5 1.5 4 1.5S14.8 19 16 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
-              </span>
+              <span class="timeline-icon">03</span>
               <span class="timeline-ping"></span>
             </div>
             <div class="timeline-card">
               <span class="timeline-label">03</span>
-              <h3><span class="it">Color & Grading</span><span class="en">Color & Grading</span></h3>
-              <p><span class="it">Look, profondità e coerenza visiva. Il progetto acquisisce atmosfera, tono e riconoscibilità.</span><span class="en">Look, depth and visual coherence. The project gains atmosphere, tone and recognizability.</span></p>
+              <h3>Color & Grading</h3>
+              <p>Look, profondità e coerenza visiva.</p>
             </div>
           </li>
-
           <li class="timeline-step timeline-step-right" data-step="4">
             <div class="timeline-node" aria-hidden="true">
-              <span class="timeline-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 14c2-4 4-6 8-6s6 2 8 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                  <path d="M6 16v2M10 18v3M14 17v2M18 15v4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
-              </span>
+              <span class="timeline-icon">04</span>
               <span class="timeline-ping"></span>
             </div>
             <div class="timeline-card">
               <span class="timeline-label">04</span>
-              <h3><span class="it">Sound Design & Mix</span><span class="en">Sound Design & Mix</span></h3>
-              <p><span class="it">Equilibrio, presenza e identità sonora. Il suono smette di accompagnare e comincia a guidare.</span><span class="en">Balance, presence and sonic identity. Sound stops accompanying and starts leading.</span></p>
+              <h3>Sound Design & Mix</h3>
+              <p>Equilibrio, presenza e identità sonora.</p>
             </div>
           </li>
-
           <li class="timeline-step timeline-step-left" data-step="5">
             <div class="timeline-node" aria-hidden="true">
-              <span class="timeline-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 4v10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                  <path d="M8.5 10.5 12 14l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M5 18h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
-              </span>
+              <span class="timeline-icon">05</span>
               <span class="timeline-ping"></span>
             </div>
             <div class="timeline-card">
               <span class="timeline-label">05</span>
-              <h3><span class="it">Delivery</span><span class="en">Delivery</span></h3>
-              <p><span class="it">Versioning, formati e consegna finale. Tutto arriva nel posto giusto, nel modo giusto.</span><span class="en">Versioning, formats and final delivery. Everything lands in the right place, the right way.</span></p>
+              <h3>Delivery</h3>
+              <p>Versioning, formati e consegna finale.</p>
             </div>
           </li>
         </ol>
       </div>
     </section>
 
-    <section class="clients" data-reveal>
+    <section class="clients" aria-label="Collaborazioni" data-reveal>
       <div class="section-head">
-        <h2><span class="it">Collaborazioni</span><span class="en">Collaborations</span></h2>
-        <p><span class="it">Brand e realtà con cui ho lavorato.</span><span class="en">Brands and partners I have worked with.</span></p>
+        <h2>Collaborazioni</h2>
+        <p>Brand e realtà con cui ho lavorato.</p>
       </div>
-      <div class="clients-row">
-        <div class="client-slot"><img src="assets/logos/adidas.png" alt="Adidas" loading="lazy"></div>
-        <div class="client-slot"><img src="assets/logos/aprilia.png" alt="Aprilia" loading="lazy"></div>
-        <div class="client-slot"><img src="assets/logos/bper.png" alt="BPER" loading="lazy"></div>
-        <div class="client-slot"><img src="assets/logos/cisalfa.png" alt="Cisalfa" loading="lazy"></div>
-        <div class="client-slot"><img src="assets/logos/dazn.png" alt="DAZN" loading="lazy"></div>
-        <div class="client-slot"><img src="assets/logos/dude.png" alt="Dude" loading="lazy"></div>
-        <div class="client-slot"><img src="assets/logos/inter.png" alt="Inter" loading="lazy"></div>
-        <div class="client-slot"><img src="assets/logos/illy.png" alt="Illy" loading="lazy"></div>
-        <div class="client-slot"><img src="assets/logos/maserati.png" alt="Maserati" loading="lazy"></div>
-        <div class="client-slot"><img src="assets/logos/pulze.png" alt="Pulze" loading="lazy"></div>
-        <div class="client-slot"><img src="assets/logos/redbull.png" alt="Red Bull" loading="lazy"></div>
-        <div class="client-slot"><img src="assets/logos/yes-milano.png" alt="Yes Milano" loading="lazy"></div>
+
+      <div class="marquee-bleed">
+        <div class="marquee" aria-label="Loghi clienti">
+          <div class="marquee-track">
+            <div class="client-slot"><img src="./assets/logos/adidas.png" alt="Adidas"></div>
+            <div class="client-slot"><img src="./assets/logos/aprilia.png" alt="Aprilia"></div>
+            <div class="client-slot"><img src="./assets/logos/bper.png" alt="BPER"></div>
+            <div class="client-slot"><img src="./assets/logos/cisalfa.png" alt="Cisalfa"></div>
+            <div class="client-slot"><img src="./assets/logos/dazn.png" alt="DAZN"></div>
+            <div class="client-slot"><img src="./assets/logos/dude.png" alt="Dude"></div>
+            <div class="client-slot"><img src="./assets/logos/inter.png" alt="Inter"></div>
+            <div class="client-slot"><img src="./assets/logos/illy.png" alt="Illy"></div>
+            <div class="client-slot"><img src="./assets/logos/maserati.png" alt="Maserati"></div>
+            <div class="client-slot"><img src="./assets/logos/pulze.png" alt="Pulze"></div>
+            <div class="client-slot"><img src="./assets/logos/redbull.png" alt="Red Bull"></div>
+            <div class="client-slot"><img src="./assets/logos/yes-milano.png" alt="Yes Milano"></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/adidas.png" alt=""></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/aprilia.png" alt=""></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/bper.png" alt=""></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/cisalfa.png" alt=""></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/dazn.png" alt=""></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/dude.png" alt=""></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/inter.png" alt=""></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/illy.png" alt=""></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/maserati.png" alt=""></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/pulze.png" alt=""></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/redbull.png" alt=""></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/yes-milano.png" alt=""></div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="final-cta final-cta-glow" id="contatti" data-reveal>
-      <div class="final-cta-orb" aria-hidden="true"></div>
-      <h2><span class="it">Hit me up.</span><span class="en">Hit me up.</span></h2>
-      <p class="final-cta-sub"><span class="it">Per progetti, collaborazioni, o per parlare del tuo prossimo film.</span><span class="en">For projects, collaborations, or to discuss your next campaign.</span></p>
+    <section class="final-cta" id="contatti" data-reveal>
+      <h2>Hit me up.</h2>
+      <p>Per progetti, collaborazioni, o per parlare del tuo prossimo film.</p>
+
       <div class="contact-row">
-        <button class="phone-reveal" type="button" aria-pressed="false">
-          <span class="cta-text"><span class="it">Mostra il numero</span><span class="en">Show number</span></span>
-          <span class="num">3460501159</span>
+        <button class="reveal-phone" type="button" aria-expanded="false" aria-controls="phone-number">
+          Click to reveal
         </button>
-        <a class="email-link" href="mailto:am@andreamonzani.com">am@andreamonzani.com</a>
+        <a class="cta-pill" href="mailto:am@andreamonzani.com">am@andreamonzani.com</a>
+      </div>
+
+      <div class="phone-wrap" id="phone-number" hidden>
+        <a class="phone-link" href="tel:+393460501159">346 050 1159</a>
       </div>
     </section>
   </main>
 
-  <footer>
-    <span><span id="year">2026</span> Andrea Monzani. <span class="it">Post-produzione & Produzione, Milano.</span><span class="en">Post-production & Producing, Milan.</span></span>
-    <a class="back-top" href="#top"><span class="it">Torna su ↑</span><span class="en">Back to top ↑</span></a>
-  </footer>
-
-  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Video">
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="lightbox-frame">
-      <button class="lightbox-close" type="button"><span class="it">Chiudi</span><span class="en">Close</span></button>
+      <button class="lightbox-close" type="button">Chiudi</button>
     </div>
   </div>
 </body>
