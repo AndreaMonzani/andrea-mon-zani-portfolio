@@ -1,54 +1,11 @@
 (function () {
   'use strict';
+
   var root = document.documentElement;
   var body = document.body;
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var consentKey = 'am_cookie_consent';
-  var scrollMarksSent = {};
 
-  function clamp(v, min, max) {
-    return Math.min(Math.max(v, min), max);
-  }
-
-  function hasAcceptedConsent() {
-    try {
-      return window.localStorage.getItem(consentKey) === 'accepted';
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function updateConsent(state) {
-    if (typeof gtag !== 'function') return;
-    if (state === 'accepted') {
-      gtag('consent', 'update', {
-        ad_storage: 'denied',
-        analytics_storage: 'granted',
-        ad_user_data: 'denied',
-        ad_personalization: 'denied',
-        functionality_storage: 'granted',
-        personalization_storage: 'denied',
-        security_storage: 'granted'
-      });
-    } else {
-      gtag('consent', 'update', {
-        ad_storage: 'denied',
-        analytics_storage: 'denied',
-        ad_user_data: 'denied',
-        ad_personalization: 'denied',
-        functionality_storage: 'denied',
-        personalization_storage: 'denied',
-        security_storage: 'granted'
-      });
-    }
-  }
-
-  function trackEvent(name, params) {
-    if (typeof gtag !== 'function') return;
-    if (!hasAcceptedConsent()) return;
-    gtag('event', name, params || {});
-  }
-
+  // LINGUA SWITCH LOGIC BILINGUE
   function initLanguage() {
     var buttons = document.querySelectorAll('.lang-switch');
     if (!buttons.length) return;
@@ -67,60 +24,33 @@
         root.classList.toggle('lang-en', lang === 'en');
         root.setAttribute('lang', lang);
         syncButtons();
-        trackEvent('language_switch', { language: lang });
       });
     });
 
     syncButtons();
   }
 
+  function clamp(v, min, max) { return Math.min(Math.max(v, min), max); }
+
   function initCursor() {
     var cursor = document.querySelector('.cursor');
-    if (!cursor || !window.matchMedia('(pointer: fine)').matches) {
+    if (!cursor || 'ontouchstart' in window) {
       if (cursor) cursor.style.display = 'none';
       return;
     }
 
     var ring = cursor.querySelector('.cursor-ring');
-    var dot = cursor.querySelector('.cursor-dot');
-    var label = cursor.querySelector('.cursor-label');
     var visible = false;
 
-    // Rimuoviamo la transizione CSS su 'transform' per l'anello, per permettere l'animazione JS fluida
-    if (ring) {
-      ring.style.transition = 'width 0.2s ease, height 0.2s ease, top 0.2s ease, left 0.2s ease, border-color 0.2s ease, opacity 0.2s ease';
-    }
-
-    var mouseX = window.innerWidth / 2;
-    var mouseY = window.innerHeight / 2;
-    var ringX = mouseX;
-    var ringY = mouseY;
-    var ringScale = 1;
-
     window.addEventListener('mousemove', function (e) {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
+      cursor.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px)';
       if (!visible) {
         cursor.classList.add('cursor--visible');
         visible = true;
       }
     }, { passive: true });
 
-    function renderCursor() {
-      // LERP: L'anello esterno calcola la distanza dal mouse e ne colma il 15% ogni frame, creando il ritardo
-      ringX += (mouseX - ringX) * 0.15;
-      ringY += (mouseY - ringY) * 0.15;
-
-      // Il punto centrale è istantaneo
-      if (dot) dot.style.transform = 'translate(' + mouseX + 'px, ' + mouseY + 'px)';
-      // L'anello esterno e la label sono ritardati
-      if (ring) ring.style.transform = 'translate(' + ringX + 'px, ' + ringY + 'px) scale(' + ringScale + ')';
-      if (label) label.style.transform = 'translate(' + ringX + 'px, ' + ringY + 'px)';
-
-      requestAnimationFrame(renderCursor);
-    }
-    requestAnimationFrame(renderCursor);
-
+    // Dividiamo il comportamento per pulsanti "Play" vs "Link normali"
     document.querySelectorAll('.showreel-btn-massive, [data-video]').forEach(function (el) {
       el.addEventListener('mouseenter', function () { cursor.classList.add('cursor--play'); });
       el.addEventListener('mouseleave', function () { cursor.classList.remove('cursor--play'); });
@@ -131,34 +61,23 @@
       el.addEventListener('mouseleave', function () { cursor.classList.remove('cursor--active'); });
     });
 
-    body.addEventListener('mousedown', function () {
-      ringScale = 0.94;
-    });
-
-    body.addEventListener('mouseup', function () {
-      ringScale = 1;
-    });
+    body.addEventListener('mousedown', function () { ring.style.transform = 'scale(0.94)'; });
+    body.addEventListener('mouseup', function () { ring.style.transform = ''; });
   }
 
   function initAmbientMotion() {
     if (reduceMotion) return;
-    var currentX = window.innerWidth * 0.5;
-    var currentY = window.innerHeight * 0.2;
-    var targetX = currentX;
-    var targetY = currentY;
-    var currentScroll = 0;
-    var targetScroll = 0;
-    var ticking = false;
+    var currentX = window.innerWidth * .5, currentY = window.innerHeight * .2;
+    var targetX = currentX, targetY = currentY, currentScroll = 0, targetScroll = 0, ticking = false;
 
     function render() {
-      currentX += (targetX - currentX) * 0.06;
-      currentY += (targetY - currentY) * 0.06;
-      currentScroll += (targetScroll - currentScroll) * 0.08;
+      currentX += (targetX - currentX) * .06;
+      currentY += (targetY - currentY) * .06;
+      currentScroll += (targetScroll - currentScroll) * .08;
       root.style.setProperty('--pointer-x', ((currentX / window.innerWidth) * 100).toFixed(2) + '%');
       root.style.setProperty('--pointer-y', ((currentY / window.innerHeight) * 100).toFixed(2) + '%');
-      root.style.setProperty('--scroll-shift', (currentScroll * 0.12).toFixed(2) + 'px');
-
-      if (Math.abs(targetX - currentX) > 0.1 || Math.abs(targetY - currentY) > 0.1 || Math.abs(targetScroll - currentScroll) > 0.1) {
+      root.style.setProperty('--scroll-shift', (currentScroll * .12).toFixed(2) + 'px');
+      if (Math.abs(targetX - currentX) > .1 || Math.abs(targetY - currentY) > .1 || Math.abs(targetScroll - currentScroll) > .1) {
         requestAnimationFrame(render);
       } else {
         ticking = false;
@@ -172,37 +91,19 @@
       }
     }
 
-    window.addEventListener('mousemove', function (e) {
-      targetX = e.clientX;
-      targetY = e.clientY;
-      requestTick();
-    }, { passive: true });
-
-    window.addEventListener('scroll', function () {
-      targetScroll = window.scrollY || window.pageYOffset;
-      requestTick();
-    }, { passive: true });
-
-    window.addEventListener('resize', function () {
-      targetX = clamp(targetX, 0, window.innerWidth);
-      targetY = clamp(targetY, 0, window.innerHeight);
-      requestTick();
-    });
-
+    window.addEventListener('mousemove', function (e) { targetX = e.clientX; targetY = e.clientY; requestTick(); }, { passive: true });
+    window.addEventListener('scroll', function () { targetScroll = window.scrollY || window.pageYOffset; requestTick(); }, { passive: true });
+    window.addEventListener('resize', function () { targetX = clamp(targetX, 0, window.innerWidth); targetY = clamp(targetY, 0, window.innerHeight); requestTick(); });
     requestTick();
   }
 
   function initReveal() {
     var els = document.querySelectorAll('[data-reveal]');
     if (!els.length) return;
-
     if (!('IntersectionObserver' in window) || reduceMotion) {
-      els.forEach(function (el) {
-        el.classList.add('is-visible');
-      });
+      els.forEach(function (el) { el.classList.add('is-visible'); });
       return;
     }
-
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
@@ -210,11 +111,8 @@
           io.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.2 });
-
-    els.forEach(function (el) {
-      io.observe(el);
-    });
+    }, { threshold: .2 });
+    els.forEach(function (el) { io.observe(el); });
   }
 
   function initTimeline() {
@@ -225,31 +123,30 @@
     if (!workflow || !steps.length || !progress || !glow) return;
 
     function update() {
+      // Ignora l'animazione di opacità e linea su smartphone in quanto abbiamo il carosello
       if (window.innerWidth <= 600) return;
 
       var rect = workflow.getBoundingClientRect();
       var vh = window.innerHeight || root.clientHeight;
-      var total = rect.height + vh * 0.35;
-      var raw = (vh * 0.72 - rect.top) / total;
+      var total = rect.height + vh * .35;
+      var raw = (vh * .72 - rect.top) / total;
       var ratio = clamp(raw, 0, 1);
       progress.style.height = (ratio * 100) + '%';
       glow.style.top = 'calc(' + (ratio * 100) + '% - 60px)';
-
+      
       steps.forEach(function (step) {
         var stepRect = step.getBoundingClientRect();
         var stepMid = stepRect.top + stepRect.height / 2;
         if (stepMid < vh * 0.75) {
-          step.classList.add('is-active');
+            step.classList.add('is-active');
         } else {
-          step.classList.remove('is-active');
+            step.classList.remove('is-active');
         }
       });
     }
 
     if (reduceMotion) {
-      steps.forEach(function (step) {
-        step.classList.add('is-active');
-      });
+      steps.forEach(function (step) { step.classList.add('is-active'); });
       progress.style.height = '100%';
       glow.style.top = 'calc(100% - 60px)';
       return;
@@ -262,24 +159,25 @@
 
   function openVideo(videoId, title, lightbox, frameNode, closeBtnNode) {
     var oldLinks = lightbox.querySelectorAll('.lightbox-fallback');
-    oldLinks.forEach(function (link) { link.remove(); });
+    oldLinks.forEach(function(link) { link.remove(); });
 
     Array.from(frameNode.children).forEach(function (node) {
       if (node !== closeBtnNode) frameNode.removeChild(node);
     });
 
     var iframe = document.createElement('iframe');
-    iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId + '?autoplay=1&mute=1&rel=0&playsinline=1';
+    
+    // Embed corretto per superare l'errore 153. Abbiamo rimosso mute=1 siccome il trigger è attivato dall'utente e aggiunto URL di base youtube.com.
+    iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0&playsinline=1';
     iframe.title = title || 'Video';
-    iframe.setAttribute('allow', 'accelerometer; autoplay; encrypted-media; picture-in-picture; fullscreen; web-share');
+    iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
     iframe.setAttribute('allowfullscreen', 'true');
     iframe.setAttribute('frameborder', '0');
-    iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
 
+    // Link di Fallback per Errore 153 (quando si apre in locale file://)
     var fallbackLink = document.createElement('a');
     fallbackLink.href = 'https://www.youtube.com/watch?v=' + videoId;
     fallbackLink.target = '_blank';
-    fallbackLink.rel = 'noopener noreferrer';
     fallbackLink.className = 'lightbox-fallback';
     fallbackLink.innerHTML = 'Il video non si carica? Clicca qui per aprirlo su YouTube ↗';
 
@@ -304,7 +202,7 @@
         if (node !== closeBtnNode) frameNode.removeChild(node);
       });
       var oldLinks = lightbox.querySelectorAll('.lightbox-fallback');
-      oldLinks.forEach(function (link) { link.remove(); });
+      oldLinks.forEach(function(link) { link.remove(); });
     }
 
     function close() {
@@ -345,7 +243,6 @@
     var btn = document.querySelector('.reveal-phone');
     var phoneWrap = document.getElementById('phone-number');
     if (!btn || !phoneWrap) return;
-
     btn.addEventListener('click', function () {
       var open = btn.getAttribute('aria-expanded') === 'true';
       btn.setAttribute('aria-expanded', String(!open));
@@ -357,15 +254,8 @@
     var monitor = document.getElementById('heroMonitor');
     if (!monitor) return;
 
-    var restRX = 8;
-    var restRY = -10;
-    var maxTiltX = 5;
-    var maxTiltY = 6;
-    var curRX = restRX;
-    var curRY = restRY;
-    var targetRX = restRX;
-    var targetRY = restRY;
-    var ticking = false;
+    var restRX = 8, restRY = -10, maxTiltX = 5, maxTiltY = 6;
+    var curRX = restRX, curRY = restRY, targetRX = restRX, targetRY = restRY, ticking = false;
 
     monitor.style.setProperty('--monitor-rx', restRX + 'deg');
     monitor.style.setProperty('--monitor-ry', restRY + 'deg');
@@ -380,11 +270,8 @@
       curRY += (targetRY - curRY) * 0.08;
       monitor.style.setProperty('--monitor-rx', curRX.toFixed(2) + 'deg');
       monitor.style.setProperty('--monitor-ry', curRY.toFixed(2) + 'deg');
-      if (Math.abs(targetRX - curRX) > 0.02 || Math.abs(targetRY - curRY) > 0.02) {
-        requestAnimationFrame(render);
-      } else {
-        ticking = false;
-      }
+      if (Math.abs(targetRX - curRX) > 0.02 || Math.abs(targetRY - curRY) > 0.02) requestAnimationFrame(render);
+      else ticking = false;
     }
 
     function requestTick() {
@@ -448,123 +335,6 @@
     onScroll();
   }
 
-  function initCookieBanner() {
-    var banner = document.getElementById('cookieBanner');
-    var acceptBtn = document.getElementById('cookieAccept');
-    var rejectBtn = document.getElementById('cookieReject');
-    if (!banner || !acceptBtn || !rejectBtn) return;
-
-    var saved = null;
-    try {
-      saved = window.localStorage.getItem(consentKey);
-    } catch (e) {
-      saved = null;
-    }
-
-    if (saved === 'accepted' || saved === 'rejected') {
-      updateConsent(saved);
-      banner.hidden = true;
-    } else {
-      banner.hidden = false;
-    }
-
-    acceptBtn.addEventListener('click', function () {
-      try { window.localStorage.setItem(consentKey, 'accepted'); } catch (e) {}
-      updateConsent('accepted');
-      banner.hidden = true;
-      trackEvent('consent_accept', { location: 'banner' });
-    });
-
-    rejectBtn.addEventListener('click', function () {
-      try { window.localStorage.setItem(consentKey, 'rejected'); } catch (e) {}
-      updateConsent('rejected');
-      banner.hidden = true;
-    });
-  }
-
-  function initScrollDepthTracking() {
-    var thresholds = [25, 50, 75, 90];
-
-    function sendScrollDepth() {
-      var scrollTop = window.scrollY || window.pageYOffset;
-      var doc = document.documentElement;
-      var scrollable = doc.scrollHeight - window.innerHeight;
-      if (scrollable <= 0) return;
-
-      var percent = Math.round((scrollTop / scrollable) * 100);
-
-      thresholds.forEach(function (threshold) {
-        if (percent >= threshold && !scrollMarksSent[threshold]) {
-          scrollMarksSent[threshold] = true;
-          trackEvent('scroll_depth', {
-            percent: threshold,
-            page_path: location.pathname,
-            page_title: document.title
-          });
-        }
-      });
-    }
-
-    window.addEventListener('scroll', sendScrollDepth, { passive: true });
-    window.addEventListener('load', sendScrollDepth);
-  }
-
-  function initContactTracking() {
-    document.querySelectorAll('a[href^="mailto:"]').forEach(function (link) {
-      link.addEventListener('click', function () {
-        trackEvent('email_click', {
-          link_text: (link.textContent || '').trim(),
-          destination: link.getAttribute('href')
-        });
-      });
-    });
-
-    document.querySelectorAll('a[href^="tel:"]').forEach(function (link) {
-      link.addEventListener('click', function () {
-        trackEvent('phone_click', {
-          link_text: (link.textContent || '').trim(),
-          destination: link.getAttribute('href')
-        });
-      });
-    });
-  }
-
-  function initVideoTracking() {
-    var showreel = document.querySelector('.showreel-tile');
-    if (showreel) {
-      showreel.addEventListener('click', function () {
-        trackEvent('showreel_open', {
-          video_id: showreel.getAttribute('data-video') || '',
-          video_title: showreel.getAttribute('data-title') || 'Showreel'
-        });
-      });
-    }
-
-    document.querySelectorAll('.work-card[data-video]').forEach(function (card) {
-      var fired = false;
-
-      function sendWorkOpen() {
-        if (fired) return;
-        fired = true;
-        trackEvent('work_open', {
-          video_id: card.getAttribute('data-video') || '',
-          video_title: card.getAttribute('data-title') || '',
-          work_label: card.querySelector('h3') ? card.querySelector('h3').textContent.trim() : ''
-        });
-        window.setTimeout(function () {
-          fired = false;
-        }, 400);
-      }
-
-      card.addEventListener('click', sendWorkOpen);
-      card.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter' || event.key === ' ') {
-          sendWorkOpen();
-        }
-      });
-    });
-  }
-
   document.addEventListener('DOMContentLoaded', function () {
     initLanguage();
     initCursor();
@@ -574,9 +344,5 @@
     initMonitor();
     initLightbox();
     initPhoneReveal();
-    initCookieBanner();
-    initScrollDepthTracking();
-    initContactTracking();
-    initVideoTracking();
   });
 })();
