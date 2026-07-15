@@ -188,14 +188,22 @@
       progress.style.height = (ratio * 100) + '%';
       glow.style.top = 'calc(' + (ratio * 100) + '% - 60px)';
 
-      steps.forEach(function (step) {
+      var viewportMid = vh * 0.48;
+      var activeIndex = 0;
+      var minDistance = Infinity;
+
+      steps.forEach(function (step, index) {
         var stepRect = step.getBoundingClientRect();
         var stepMid = stepRect.top + stepRect.height / 2;
-        if (stepMid < vh * 0.75) {
-          step.classList.add('is-active');
-        } else {
-          step.classList.remove('is-active');
+        var distance = Math.abs(viewportMid - stepMid);
+        if (distance < minDistance) {
+          minDistance = distance;
+          activeIndex = index;
         }
+      });
+
+      steps.forEach(function (step, index) {
+        step.classList.toggle('is-active', index === activeIndex && rect.top < vh && rect.bottom > 0);
       });
     }
 
@@ -211,6 +219,22 @@
     update();
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
+  }
+
+  function initSwipeHints() {
+    var carousels = document.querySelectorAll('.works-grid, .timeline-cinematic');
+    carousels.forEach(function (c) {
+      var section = c.closest('section');
+      if (!section) return;
+      var hint = section.querySelector('.swipe-hint');
+      if (!hint) return;
+      
+      c.addEventListener('scroll', function () {
+        if (c.scrollLeft > 20) {
+          hint.classList.add('is-hidden');
+        }
+      }, { passive: true });
+    });
   }
 
   function openVideo(videoId, title, lightbox, frameNode, closeBtnNode) {
@@ -293,7 +317,7 @@
   }
 
   function initPhoneReveal() {
-    var btn = document.querySelector('.reveal-phone');
+    var btn = document.querySelector('.phone-reveal');
     var phoneWrap = document.getElementById('phone-number');
     if (!btn || !phoneWrap) return;
 
@@ -301,6 +325,7 @@
       var open = btn.getAttribute('aria-expanded') === 'true';
       btn.setAttribute('aria-expanded', String(!open));
       phoneWrap.hidden = open;
+      btn.classList.toggle('is-revealed', !open);
     });
   }
 
@@ -308,15 +333,8 @@
     var monitor = document.getElementById('heroMonitor');
     if (!monitor) return;
 
-    var restRX = 8;
-    var restRY = -10;
-    var maxTiltX = 5;
-    var maxTiltY = 6;
-    var curRX = restRX;
-    var curRY = restRY;
-    var targetRX = restRX;
-    var targetRY = restRY;
-    var ticking = false;
+    var restRX = 8, restRY = -10, maxTiltX = 5, maxTiltY = 6;
+    var curRX = restRX, curRY = restRY, targetRX = restRX, targetRY = restRY, ticking = false;
 
     monitor.style.setProperty('--monitor-rx', restRX + 'deg');
     monitor.style.setProperty('--monitor-ry', restRY + 'deg');
@@ -331,11 +349,8 @@
       curRY += (targetRY - curRY) * 0.08;
       monitor.style.setProperty('--monitor-rx', curRX.toFixed(2) + 'deg');
       monitor.style.setProperty('--monitor-ry', curRY.toFixed(2) + 'deg');
-      if (Math.abs(targetRX - curRX) > 0.02 || Math.abs(targetRY - curRY) > 0.02) {
-        requestAnimationFrame(render);
-      } else {
-        ticking = false;
-      }
+      if (Math.abs(targetRX - curRX) > 0.02 || Math.abs(targetRY - curRY) > 0.02) requestAnimationFrame(render);
+      else ticking = false;
     }
 
     function requestTick() {
@@ -405,6 +420,7 @@
     initAmbientMotion();
     initReveal();
     initTimeline();
+    initSwipeHints();
     initMonitor();
     initLightbox();
     initPhoneReveal();
