@@ -82,15 +82,44 @@
     }
 
     var ring = cursor.querySelector('.cursor-ring');
+    var dot = cursor.querySelector('.cursor-dot');
+    var label = cursor.querySelector('.cursor-label');
     var visible = false;
 
+    // Rimuoviamo la transizione CSS su 'transform' per l'anello, per permettere l'animazione JS fluida
+    if (ring) {
+      ring.style.transition = 'width 0.2s ease, height 0.2s ease, top 0.2s ease, left 0.2s ease, border-color 0.2s ease, opacity 0.2s ease';
+    }
+
+    var mouseX = window.innerWidth / 2;
+    var mouseY = window.innerHeight / 2;
+    var ringX = mouseX;
+    var ringY = mouseY;
+    var ringScale = 1;
+
     window.addEventListener('mousemove', function (e) {
-      cursor.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px)';
+      mouseX = e.clientX;
+      mouseY = e.clientY;
       if (!visible) {
         cursor.classList.add('cursor--visible');
         visible = true;
       }
     }, { passive: true });
+
+    function renderCursor() {
+      // LERP: L'anello esterno calcola la distanza dal mouse e ne colma il 15% ogni frame, creando il ritardo
+      ringX += (mouseX - ringX) * 0.15;
+      ringY += (mouseY - ringY) * 0.15;
+
+      // Il punto centrale è istantaneo
+      if (dot) dot.style.transform = 'translate(' + mouseX + 'px, ' + mouseY + 'px)';
+      // L'anello esterno e la label sono ritardati
+      if (ring) ring.style.transform = 'translate(' + ringX + 'px, ' + ringY + 'px) scale(' + ringScale + ')';
+      if (label) label.style.transform = 'translate(' + ringX + 'px, ' + ringY + 'px)';
+
+      requestAnimationFrame(renderCursor);
+    }
+    requestAnimationFrame(renderCursor);
 
     document.querySelectorAll('.showreel-btn-massive, [data-video]').forEach(function (el) {
       el.addEventListener('mouseenter', function () { cursor.classList.add('cursor--play'); });
@@ -103,11 +132,11 @@
     });
 
     body.addEventListener('mousedown', function () {
-      if (ring) ring.style.transform = 'scale(0.94)';
+      ringScale = 0.94;
     });
 
     body.addEventListener('mouseup', function () {
-      if (ring) ring.style.transform = '';
+      ringScale = 1;
     });
   }
 
