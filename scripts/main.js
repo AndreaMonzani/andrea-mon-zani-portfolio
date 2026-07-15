@@ -246,11 +246,12 @@
     });
 
     var iframe = document.createElement('iframe');
-    iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0&playsinline=1';
+    iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
     iframe.title = title || 'Video';
     iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
     iframe.setAttribute('allowfullscreen', 'true');
     iframe.setAttribute('frameborder', '0');
+    iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
 
     var fallbackLink = document.createElement('a');
     fallbackLink.href = 'https://www.youtube.com/watch?v=' + videoId;
@@ -259,8 +260,6 @@
     fallbackLink.innerHTML = 'Il video non si carica? Clicca qui per aprirlo su YouTube ↗';
 
     frameNode.insertBefore(iframe, closeBtnNode);
-    lightbox.appendChild(fallbackLink);
-
     lightbox.setAttribute('aria-hidden', 'false');
     body.classList.add('lightbox-open');
     window.setTimeout(function () { closeBtnNode.focus(); }, 60);
@@ -317,7 +316,7 @@
   }
 
   function initPhoneReveal() {
-    var btn = document.querySelector('.phone-reveal');
+    var btn = document.querySelector('.reveal-phone');
     var phoneWrap = document.getElementById('phone-number');
     if (!btn || !phoneWrap) return;
 
