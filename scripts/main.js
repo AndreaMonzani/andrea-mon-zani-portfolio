@@ -234,7 +234,6 @@
         }
       }, { passive: true });
 
-      // Gestione indicatori pallini se presenti
       var dotsContainer = section.querySelector('.carousel-indicators');
       if(dotsContainer) {
         var dots = dotsContainer.querySelectorAll('.dot');
@@ -242,7 +241,6 @@
         if(dots.length && items.length) {
           c.addEventListener('scroll', function () {
             var cardWidth = items[0].offsetWidth;
-            // Aggiungiamo metà gap per evitare che l'indice cambi troppo presto
             var index = Math.round((c.scrollLeft) / (cardWidth + 16));
             dots.forEach(function(d, i) {
               d.classList.toggle('active', i === index);
@@ -332,14 +330,12 @@
 
   function initPhoneReveal() {
     var btn = document.querySelector('.phone-reveal');
-    var phoneWrap = document.getElementById('phone-number');
-    if (!btn || !phoneWrap) return;
+    if (!btn) return;
 
     btn.addEventListener('click', function () {
-      var open = btn.getAttribute('aria-expanded') === 'true';
-      btn.setAttribute('aria-expanded', String(!open));
-      phoneWrap.hidden = open;
-      btn.classList.toggle('is-revealed', !open);
+      var isRevealed = btn.classList.contains('is-revealed');
+      btn.setAttribute('aria-expanded', String(!isRevealed));
+      btn.classList.toggle('is-revealed', !isRevealed);
     });
   }
 
