@@ -234,6 +234,7 @@
         }
       }, { passive: true });
 
+      // Gestione indicatori pallini se presenti
       var dotsContainer = section.querySelector('.carousel-indicators');
       if(dotsContainer) {
         var dots = dotsContainer.querySelectorAll('.dot');
@@ -241,6 +242,7 @@
         if(dots.length && items.length) {
           c.addEventListener('scroll', function () {
             var cardWidth = items[0].offsetWidth;
+            // Aggiungiamo metà gap per evitare che l'indice cambi troppo presto
             var index = Math.round((c.scrollLeft) / (cardWidth + 16));
             dots.forEach(function(d, i) {
               d.classList.toggle('active', i === index);
