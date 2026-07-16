@@ -303,33 +303,6 @@ ul, ol {
   line-height: 1.6;
 }
 
-.hero-actions {
-  margin-top: 32px;
-  display: flex;
-  gap: 16px;
-}
-
-.hero-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 14px 32px;
-  border-radius: 999px;
-  background: var(--accent);
-  color: var(--bg);
-  font-weight: 700;
-  font-size: 0.95rem;
-  letter-spacing: 0.02em;
-  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
-  box-shadow: 0 0 0 0 rgba(143, 121, 230, 0.4);
-}
-
-.hero-cta:hover,
-.hero-cta:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(143, 121, 230, 0.4);
-}
-
 .hero-media {
   position: relative;
   width: min(55vw, 780px);
@@ -704,7 +677,7 @@ ul, ol {
 }
 
 .carousel-indicators {
-  display: none; /* Only show on mobile */
+  display: none; 
 }
 
 /* HINT MOBILE (nascosto su desktop) */
@@ -874,7 +847,7 @@ ul, ol {
 .timeline-cinematic {
   display: flex;
   flex-direction: column;
-  gap: 16px; /* Più compatto in verticale su desktop */
+  gap: 16px; 
 }
 
 .timeline-step {
@@ -882,7 +855,7 @@ ul, ol {
   grid-template-columns: 1fr 72px 1fr;
   align-items: center;
   gap: 32px;
-  min-height: 140px; /* Più compatto in verticale su desktop */
+  min-height: 120px; 
   transition: opacity 0.5s var(--ease);
 }
 
@@ -892,7 +865,7 @@ ul, ol {
   background: rgba(255, 255, 255, 0.01);
   border: 1px solid var(--line);
   border-radius: 18px;
-  padding: 20px 24px; /* Più compatto in verticale su desktop */
+  padding: 20px 24px; 
   backdrop-filter: blur(18px);
 }
 
@@ -935,7 +908,6 @@ ul, ol {
 
 .timeline-step-left .timeline-card {
   grid-column: 1;
-  text-align: right;
 }
 
 .timeline-step-left .timeline-node {
@@ -970,12 +942,6 @@ ul, ol {
 
 .timeline-step.is-active .timeline-ping {
   animation: ping 1.6s ease-out infinite;
-}
-
-.timeline-label {
-  font-size: 0.7rem;
-  color: var(--accent);
-  letter-spacing: 0.06em;
 }
 
 .timeline-card h3 {
@@ -1275,7 +1241,10 @@ body.lightbox-open {
   }
 
   .hero { min-height: 50svh; padding-top: 130px; padding-bottom: 40px; }
-  .hero h1 { font-size: clamp(2.4rem, 10vw, 3.2rem); line-height: 1.1; }
+  .hero-content { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .hero h1 { font-size: clamp(2.4rem, 10vw, 3.2rem); line-height: 1.1; text-align: center; }
+  .hero-sub { text-align: center; }
+  
   .hero-orb { animation: mobileGlowPulse 8s infinite alternate ease-in-out; opacity: 0.8; }
   .hero-orb-a { width: 300px; height: 300px; }
   .hero-orb-b { width: 350px; height: 350px; }
@@ -1287,6 +1256,8 @@ body.lightbox-open {
   .swipe-hint {
     display: flex;
     align-items: center;
+    justify-content: center;
+    width: 100%;
     gap: 8px;
     margin-top: 12px;
     opacity: 1;
@@ -1323,6 +1294,9 @@ body.lightbox-open {
     50% { transform: translateX(6px); box-shadow: 0 0 14px 0 rgba(143, 121, 230, 0); }
   }
 
+  .section-head { flex-direction: column; align-items: center; text-align: center; }
+  .section-head p { max-width: 100%; }
+
   .showreel-premium { padding-top: 20px; }
   .showreel-btn-massive { border-radius: 18px; padding: 24px; min-height: 240px; align-items: center; justify-content: center; text-align: center; }
   .showreel-bottom-content { flex-direction: column; gap: 12px; margin-top: 0; align-items: center; }
@@ -1354,6 +1328,7 @@ body.lightbox-open {
     border-radius: 20px; 
   }
   .work-logo { top: 16px; right: 16px; font-size: 0.6rem; padding: 4px 8px; }
+  .work-meta { text-align: left; }
   .work-meta h3 { font-size: 1.2rem; }
   .work-meta p { font-size: 0.9rem; }
   
@@ -1393,14 +1368,12 @@ body.lightbox-open {
     gap: 16px; 
     opacity: 1 !important; 
   }
-  .timeline-label { display: none !important; }
-  .timeline-node { width: 48px; height: 48px; opacity: 1 !important; }
-  .timeline-card { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 24px; border-radius: 20px; opacity: 1 !important; border-color: var(--line-strong) !important; box-shadow: none !important; }
+  .timeline-node { width: 48px; height: 48px; opacity: 1 !important; margin: 0 auto; }
+  .timeline-card { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 24px; border-radius: 20px; opacity: 1 !important; border-color: var(--line-strong) !important; box-shadow: none !important; align-items: center; text-align: center; }
   .timeline-card h3 { font-size: 1.25rem; color: var(--fg) !important; }
   .timeline-card p { font-size: 0.9rem; color: var(--muted) !important; }
   .timeline-icon { color: var(--fg) !important; }
 
-  /* Animated Indicator Dots per il carosello Workflow */
   .carousel-indicators { display: flex; justify-content: center; gap: 8px; margin-top: 16px; }
   .carousel-indicators .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--line-strong); transition: background 0.3s var(--ease), transform 0.3s var(--ease); }
   .carousel-indicators .dot.active { background: var(--accent); transform: scale(1.4); }
@@ -1411,9 +1384,9 @@ body.lightbox-open {
   .client-slot img { max-height: 38px; opacity: 1; }
 
   .clients { padding-bottom: 48px; }
-  .final-cta { padding-top: 64px; }
-  .contact-row { flex-direction: column; align-items: stretch; width: 100%; }
-  .reveal-phone, .cta-pill { width: 100%; text-align: center; padding: 18px; font-size: 1rem; }
+  .final-cta { padding-top: 64px; text-align: center; }
+  .contact-row { flex-direction: column; align-items: center; justify-content: center; width: 100%; }
+  .phone-reveal, .cta-pill { width: 100%; max-width: 320px; text-align: center; padding: 18px; font-size: 1rem; }
   .phone-wrap { text-align: center; width: 100%; }
   .phone-link { display: flex; justify-content: center; width: 100%; }
 }
