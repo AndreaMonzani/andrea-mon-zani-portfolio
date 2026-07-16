@@ -332,7 +332,8 @@
     var btn = document.querySelector('.phone-reveal');
     if (!btn) return;
 
-    btn.addEventListener('click', function () {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
       var isRevealed = btn.classList.contains('is-revealed');
       btn.setAttribute('aria-expanded', String(!isRevealed));
       btn.classList.toggle('is-revealed', !isRevealed);
