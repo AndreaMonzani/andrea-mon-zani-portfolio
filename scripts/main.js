@@ -175,50 +175,82 @@
     var steps = document.querySelectorAll('.timeline-step');
     var progress = document.getElementById('timelineProgress');
     var glow = document.querySelector('.timeline-axis-glow');
-    if (!workflow || !steps.length || !progress || !glow) return;
+    var cinematic = document.querySelector('.timeline-cinematic');
+    
+    if (!workflow || !steps.length) return;
 
-    function update() {
-      if (window.innerWidth <= 600) return;
+    function updateDesktop() {
+      if (window.innerWidth > 600 && progress && glow) {
+        var rect = workflow.getBoundingClientRect();
+        var vh = window.innerHeight || root.clientHeight;
+        var total = rect.height + vh * 0.35;
+        var raw = (vh * 0.72 - rect.top) / total;
+        var ratio = clamp(raw, 0, 1);
+        progress.style.height = (ratio * 100) + '%';
+        glow.style.top = 'calc(' + (ratio * 100) + '% - 60px)';
 
-      var rect = workflow.getBoundingClientRect();
-      var vh = window.innerHeight || root.clientHeight;
-      var total = rect.height + vh * 0.35;
-      var raw = (vh * 0.72 - rect.top) / total;
-      var ratio = clamp(raw, 0, 1);
-      progress.style.height = (ratio * 100) + '%';
-      glow.style.top = 'calc(' + (ratio * 100) + '% - 60px)';
+        var viewportMid = vh * 0.48;
+        var activeIndex = 0;
+        var minDistance = Infinity;
 
-      var viewportMid = vh * 0.48;
-      var activeIndex = 0;
-      var minDistance = Infinity;
+        steps.forEach(function (step, index) {
+          var stepRect = step.getBoundingClientRect();
+          var stepMid = stepRect.top + stepRect.height / 2;
+          var distance = Math.abs(viewportMid - stepMid);
+          if (distance < minDistance) {
+            minDistance = distance;
+            activeIndex = index;
+          }
+        });
 
-      steps.forEach(function (step, index) {
-        var stepRect = step.getBoundingClientRect();
-        var stepMid = stepRect.top + stepRect.height / 2;
-        var distance = Math.abs(viewportMid - stepMid);
-        if (distance < minDistance) {
-          minDistance = distance;
-          activeIndex = index;
-        }
-      });
+        steps.forEach(function (step, index) {
+          step.classList.toggle('is-active', index === activeIndex && rect.top < vh && rect.bottom > 0);
+        });
+      }
+    }
 
-      steps.forEach(function (step, index) {
-        step.classList.toggle('is-active', index === activeIndex && rect.top < vh && rect.bottom > 0);
-      });
+    function updateMobile() {
+      if (window.innerWidth <= 600 && cinematic) {
+        var containerRect = cinematic.getBoundingClientRect();
+        var containerCenter = containerRect.left + (containerRect.width / 2);
+        var activeIndex = 0;
+        var minDistance = Infinity;
+
+        steps.forEach(function (step, index) {
+          var rect = step.getBoundingClientRect();
+          var stepCenter = rect.left + (rect.width / 2);
+          var distance = Math.abs(containerCenter - stepCenter);
+          if (distance < minDistance) {
+            minDistance = distance;
+            activeIndex = index;
+          }
+        });
+
+        steps.forEach(function (step, index) {
+          step.classList.toggle('is-active', index === activeIndex);
+        });
+      }
     }
 
     if (reduceMotion) {
       steps.forEach(function (step) {
         step.classList.add('is-active');
       });
-      progress.style.height = '100%';
-      glow.style.top = 'calc(100% - 60px)';
+      if (progress) progress.style.height = '100%';
+      if (glow) glow.style.top = 'calc(100% - 60px)';
       return;
     }
 
-    update();
-    window.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
+    window.addEventListener('scroll', updateDesktop, { passive: true });
+    if (cinematic) cinematic.addEventListener('scroll', updateMobile, { passive: true });
+    
+    window.addEventListener('resize', function() {
+      updateDesktop();
+      updateMobile();
+    });
+
+    updateDesktop();
+    updateMobile();
   }
 
   function initSwipeHints() {
