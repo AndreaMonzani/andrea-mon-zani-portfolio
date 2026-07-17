@@ -29,6 +29,7 @@ body {
   cursor: none;
 }
 
+/* FIX CURSORE DESKTOP / MOBILE */
 @media (pointer: fine) { body, a, button, * { cursor: none !important; } }
 @media (pointer: coarse) { .cursor { display: none !important; } body, a, button, * { cursor: auto !important; } }
 
@@ -186,7 +187,8 @@ ul, ol { list-style: none; padding: 0; margin: 0; }
 .timeline-step-right .timeline-card { grid-column: 3; }
 .timeline-step-right .timeline-node { grid-column: 2; }
 
-.timeline-icon { font-size: 0.85rem; color: var(--muted); transition: color 0.4s var(--ease); }
+.timeline-icon { font-size: 0.85rem; color: var(--muted); transition: color 0.4s var(--ease); display: flex; }
+.timeline-icon svg { width: 24px; height: 24px; }
 .timeline-step.is-active .timeline-icon { color: var(--fg); }
 .timeline-ping { position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--accent); opacity: 0; }
 .timeline-step.is-active .timeline-ping { animation: ping 1.6s ease-out infinite; }
@@ -207,18 +209,100 @@ ul, ol { list-style: none; padding: 0; margin: 0; }
 .final-cta p { color: var(--muted); margin-top: 22px; max-width: 40ch; font-size: 1.05rem; }
 .contact-row { margin-top: 44px; display: flex; flex-wrap: wrap; align-items: center; gap: 20px; position: relative; z-index: 10; }
 
-.phone-reveal, .cta-pill { min-height: 54px; padding: 0 20px; border-radius: 999px; border: 1px solid var(--line-strong); display: inline-flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.02); transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease; position: relative; }
-.cta-pill:hover, .cta-pill:focus-visible { border-color: var(--accent); box-shadow: 0 0 32px rgba(143, 121, 230, 0.14); transform: translateY(-2px); }
+/* PHONE BUTTON - COMPLETELY REBUILT FOR CLICKABILITY */
+.phone-reveal, .cta-pill {
+  min-height: 54px;
+  padding: 0 24px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.3s var(--ease);
+  position: relative;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  overflow: hidden; /* For safety */
+}
 
-.phone-reveal { perspective: 1000px; cursor: pointer; pointer-events: auto; }
-.phone-reveal .num { opacity: 0; transform: scale(0.85); transition: opacity 0.4s var(--ease), transform 0.4s var(--ease); color: var(--accent); font-weight: 600; letter-spacing: 0.05em; pointer-events: none; }
-.phone-reveal.is-revealed .num { opacity: 1; transform: scale(1); position: relative; }
-.peel-overlay { position: absolute; inset: -1px; border-radius: 999px; background: linear-gradient(135deg, #1f1d24, #0b0b0c); border: 1px solid var(--line-strong); display: flex; align-items: center; justify-content: center; transform-origin: top right; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease, box-shadow 0.4s ease; z-index: 2; backface-visibility: hidden; pointer-events: none; }
-.peel-overlay::after { content: ""; position: absolute; top: -1px; right: -1px; width: 22px; height: 22px; background: linear-gradient(225deg, var(--bg) 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.05) 100%); border-bottom-left-radius: 6px; transition: width 0.4s var(--ease), height 0.4s var(--ease); pointer-events: none; box-shadow: -2px 2px 5px rgba(0,0,0,0.3); }
-.phone-reveal:hover .peel-overlay { transform: rotateZ(-2deg) rotateY(-12deg) rotateX(8deg); box-shadow: -4px 8px 16px rgba(0,0,0,0.5); background: linear-gradient(135deg, #2a2731, #0f0e11); border-color: var(--accent-soft); }
-.phone-reveal:hover .peel-overlay::after { width: 32px; height: 32px; background: linear-gradient(225deg, transparent 50%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.05) 100%); }
-.phone-reveal.is-revealed .peel-overlay { transform: rotateZ(-15deg) rotateY(-60deg) rotateX(40deg) translate3d(-10px, -40px, 40px); opacity: 0; pointer-events: none; }
-.phone-reveal.is-revealed { border-color: var(--accent); box-shadow: 0 0 32px rgba(143, 121, 230, 0.14); background: rgba(143, 121, 230, 0.05); }
+.cta-pill:hover,
+.cta-pill:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 32px rgba(143, 121, 230, 0.14);
+  transform: translateY(-2px);
+}
+
+/* Base state: Number is hidden below */
+.phone-reveal .num {
+  position: relative;
+  z-index: 1;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+}
+
+/* Base state: Overlay covers everything */
+.peel-overlay {
+  position: absolute;
+  inset: -2px; /* Cover border completely */
+  border-radius: 999px;
+  background: linear-gradient(135deg, #1f1d24, #0b0b0c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg);
+  z-index: 2;
+  transform-origin: top right;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+  pointer-events: none; /* Let clicks pass to button */
+  border: 1px solid var(--line-strong);
+}
+
+/* The folded dog-ear corner */
+.peel-overlay::after {
+  content: "";
+  position: absolute;
+  top: -1px; right: -1px;
+  width: 20px; height: 20px;
+  background: linear-gradient(225deg, var(--bg) 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.05) 100%);
+  border-bottom-left-radius: 6px;
+  transition: width 0.4s var(--ease), height 0.4s var(--ease);
+  pointer-events: none;
+  box-shadow: -2px 2px 5px rgba(0,0,0,0.3);
+}
+
+/* Hover State */
+.phone-reveal:hover .peel-overlay {
+  transform: rotateZ(-2deg) rotateY(-10deg) rotateX(8deg);
+  box-shadow: -4px 8px 16px rgba(0,0,0,0.5);
+  background: linear-gradient(135deg, #2a2731, #0f0e11);
+  border-color: var(--accent-soft);
+}
+
+.phone-reveal:hover .peel-overlay::after {
+  width: 28px; height: 28px;
+}
+
+/* Active/Revealed State */
+.phone-reveal.is-revealed {
+  border-color: var(--accent);
+  box-shadow: 0 0 32px rgba(143, 121, 230, 0.14);
+  background: rgba(143, 121, 230, 0.05);
+}
+
+.phone-reveal.is-revealed .num {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.phone-reveal.is-revealed .peel-overlay {
+  transform: rotateZ(-15deg) rotateY(-60deg) rotateX(40deg) translate3d(-20px, -40px, 40px);
+  opacity: 0;
+}
 
 /* FOOTER PREMIUM STYLE */
 .site-footer { padding: 0 var(--gutter) 40px; }
@@ -248,6 +332,7 @@ body.lightbox-open { overflow: hidden; }
 @keyframes float-dust { 0% { transform: translateY(0) scale(0.8); opacity: 0; } 20% { opacity: 0.8; } 80% { opacity: 0.8; } 100% { transform: translateY(-150px) scale(1.5); opacity: 0; } }
 @keyframes bg-zoom { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
 @keyframes mobileGlowPulse { 0% { transform: scale(1) translate(0, 0); opacity: 0.6; } 100% { transform: scale(1.3) translate(-10%, 10%); opacity: 0.9; } }
+@keyframes ping-massive { 0% { opacity: 0.8; transform: scale(1); } 100% { opacity: 0; transform: scale(1.8); } }
 
 @media (min-width: 800px) {
   .footer-glass { flex-direction: row; justify-content: space-between; align-items: center; }
@@ -325,13 +410,18 @@ body.lightbox-open { overflow: hidden; }
   .timeline-cinematic { display: flex; flex-direction: row; overflow-x: auto; scroll-snap-type: x mandatory; gap: 16px; padding-bottom: 24px; -webkit-overflow-scrolling: touch; scrollbar-width: none; align-items: stretch; }
   .timeline-cinematic::-webkit-scrollbar { display: none; }
   .timeline-step { flex: none; width: 85vw; max-width: 320px; display: flex; flex-direction: column; align-items: center; scroll-snap-align: center; scroll-snap-stop: always; height: auto; gap: 16px; opacity: 1 !important; }
-  .timeline-icon svg { display: none; }
-  .step-num { display: block; font-family: var(--font); font-size: 1.4rem; font-weight: 700; color: var(--muted); transition: color 0.4s var(--ease); }
-  .timeline-step.is-active .step-num { color: var(--accent); text-shadow: 0 0 12px rgba(143,121,230,0.6); }
-  .timeline-node { width: 64px; height: 64px; opacity: 1 !important; margin: 0 auto; background: rgba(11,11,12, 0.8); border: 2px solid var(--line-strong); transition: all 0.4s var(--ease); }
-  .timeline-step.is-active .timeline-node { border-color: var(--accent); background: rgba(143,121,230,0.15); box-shadow: 0 0 24px rgba(143,121,230,0.4); transform: scale(1.1); }
+  
+  /* WORKFLOW MOBILE - ANIMAZIONE NODI E NUMERI */
+  .timeline-icon { display: none !important; }
+  .step-num { display: flex !important; align-items: center; justify-content: center; font-family: var(--font); font-size: 2rem; font-weight: 800; color: rgba(239, 237, 232, 0.15); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+  .timeline-step.is-active .step-num { color: #fff; text-shadow: 0 0 16px rgba(143, 121, 230, 0.8); transform: scale(1.1); }
+  
+  .timeline-node { width: 80px; height: 80px; opacity: 1 !important; margin: 0 auto; background: #0b0b0c; border: 1px solid rgba(239, 237, 232, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); position: relative; }
+  .timeline-step.is-active .timeline-node { border-color: var(--accent); background: linear-gradient(135deg, rgba(143, 121, 230, 0.15), rgba(11, 11, 12, 0.9)); box-shadow: 0 10px 30px rgba(143, 121, 230, 0.25), inset 0 0 15px rgba(143, 121, 230, 0.2); transform: translateY(-8px) scale(1.1); }
+  .timeline-step.is-active .timeline-ping { animation: ping-massive 2s cubic-bezier(0.16, 1, 0.3, 1) infinite; border-width: 2px; }
+
   .timeline-card { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 24px; border-radius: 20px; opacity: 1 !important; border-color: var(--line-strong) !important; box-shadow: none !important; align-items: center; text-align: center; }
-  .timeline-card h3 { font-size: 1.25rem; color: var(--fg) !important; }
+  .timeline-card h3 { font-size: 1.25rem; color: var(--fg) !important; text-align: center; }
   .timeline-card p { font-size: 0.9rem; color: var(--muted) !important; text-align: center; }
 
   .carousel-indicators { display: flex; justify-content: center; gap: 8px; margin-top: 16px; }
@@ -346,9 +436,9 @@ body.lightbox-open { overflow: hidden; }
   .clients { padding-bottom: 48px; }
   .final-cta { padding-top: 64px; text-align: center; }
   .contact-row { flex-direction: column; align-items: center; justify-content: center; width: 100%; }
+  
+  /* PHONE BUTTON MOBILE FULL WIDTH */
   .phone-reveal, .cta-pill { width: 100%; max-width: 320px; text-align: center; padding: 18px; font-size: 1rem; }
-  .phone-wrap { text-align: center; width: 100%; }
-  .phone-link { display: flex; justify-content: center; width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
