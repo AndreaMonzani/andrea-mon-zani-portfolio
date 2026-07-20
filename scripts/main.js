@@ -170,15 +170,75 @@
     });
   }
 
+  // --- LOGICA MOTION TABS (Desktop Header & Mobile Workflow) ---
+  function updateBubble(bubble, target) {
+    if (!bubble) return;
+    if (!target) {
+      bubble.style.opacity = '0';
+      return;
+    }
+    bubble.style.opacity = '1';
+    bubble.style.width = target.offsetWidth + 'px';
+    bubble.style.height = target.offsetHeight + 'px';
+    bubble.style.transform = 'translate(' + target.offsetLeft + 'px, ' + target.offsetTop + 'px)';
+  }
+
+  function initMotionTabs() {
+    var wraps = document.querySelectorAll('.nav-wrap');
+    
+    wraps.forEach(function(wrap) {
+      var activeBubble = wrap.querySelector('.active-bubble');
+      var hoverBubble = wrap.querySelector('.hover-bubble');
+      var items = wrap.querySelectorAll('a, button.tab-num');
+
+      // Set initial state
+      var activeItem = wrap.querySelector('.active') || items[0];
+      if (activeItem) {
+        activeItem.classList.add('active');
+        setTimeout(function() { updateBubble(activeBubble, activeItem); }, 50); // delay for font loading
+      }
+
+      items.forEach(function(item) {
+        item.addEventListener('mouseenter', function() {
+          if (hoverBubble) updateBubble(hoverBubble, item);
+        });
+        item.addEventListener('mouseleave', function() {
+          if (hoverBubble) updateBubble(hoverBubble, null);
+        });
+        item.addEventListener('click', function(e) {
+          // If anchor link, let smooth scroll happen naturally, but visually update immediately
+          items.forEach(function(i) { i.classList.remove('active'); });
+          item.classList.add('active');
+          updateBubble(activeBubble, item);
+        });
+      });
+
+      wrap.addEventListener('mouseleave', function() {
+        if (hoverBubble) updateBubble(hoverBubble, null);
+      });
+    });
+
+    // Update on resize
+    window.addEventListener('resize', function() {
+      document.querySelectorAll('.nav-wrap').forEach(function(wrap) {
+        var activeItem = wrap.querySelector('.active');
+        var activeBubble = wrap.querySelector('.active-bubble');
+        if (activeItem && activeBubble) updateBubble(activeBubble, activeItem);
+      });
+    }, { passive: true });
+  }
+
   function initTimeline() {
     var workflow = document.getElementById('workflow');
     var steps = document.querySelectorAll('.timeline-step');
     var progress = document.getElementById('timelineProgress');
     var glow = document.querySelector('.timeline-axis-glow');
     var cinematic = document.querySelector('.timeline-cinematic');
+    var workflowTabs = document.querySelector('.workflow-tabs');
     
     if (!workflow || !steps.length) return;
 
+    // Desktop Vertical Scroll Logic
     function updateDesktop() {
       if (window.innerWidth > 600 && progress && glow) {
         var rect = workflow.getBoundingClientRect();
@@ -209,48 +269,42 @@
       }
     }
 
-    function updateMobile() {
-      if (window.innerWidth <= 600 && cinematic) {
-        var containerRect = cinematic.getBoundingClientRect();
-        var containerCenter = containerRect.left + (containerRect.width / 2);
-        var activeIndex = 0;
-        var minDistance = Infinity;
-
-        steps.forEach(function (step, index) {
-          var rect = step.getBoundingClientRect();
-          var stepCenter = rect.left + (rect.width / 2);
-          var distance = Math.abs(containerCenter - stepCenter);
-          if (distance < minDistance) {
-            minDistance = distance;
-            activeIndex = index;
-          }
+    // Mobile Horizontal Scroll Logic (Syncs with Motion Tabs)
+    if (cinematic && workflowTabs) {
+      var nums = workflowTabs.querySelectorAll('.tab-num');
+      var activeBubble = workflowTabs.querySelector('.active-bubble');
+      
+      cinematic.addEventListener('scroll', function() {
+        if (window.innerWidth > 600) return;
+        var cardWidth = cinematic.children[0].offsetWidth;
+        var index = Math.round(cinematic.scrollLeft / (cardWidth + 16));
+        
+        if (nums[index] && !nums[index].classList.contains('active')) {
+          nums.forEach(function(n) { n.classList.remove('active'); });
+          nums[index].classList.add('active');
+          updateBubble(activeBubble, nums[index]);
+        }
+      }, { passive: true });
+      
+      // Click on motion tab to scroll carousel
+      nums.forEach(function(num, i) {
+        num.addEventListener('click', function() {
+          var cardWidth = cinematic.children[0].offsetWidth;
+          cinematic.scrollTo({ left: i * (cardWidth + 16), behavior: 'smooth' });
         });
-
-        steps.forEach(function (step, index) {
-          step.classList.toggle('is-active', index === activeIndex);
-        });
-      }
+      });
     }
 
     if (reduceMotion) {
-      steps.forEach(function (step) {
-        step.classList.add('is-active');
-      });
+      steps.forEach(function (step) { step.classList.add('is-active'); });
       if (progress) progress.style.height = '100%';
       if (glow) glow.style.top = 'calc(100% - 60px)';
       return;
     }
 
     window.addEventListener('scroll', updateDesktop, { passive: true });
-    if (cinematic) cinematic.addEventListener('scroll', updateMobile, { passive: true });
-    
-    window.addEventListener('resize', function() {
-      updateDesktop();
-      updateMobile();
-    });
-
+    window.addEventListener('resize', updateDesktop);
     updateDesktop();
-    updateMobile();
   }
 
   function initSwipeHints() {
@@ -266,7 +320,8 @@
         }
       }, { passive: true });
 
-      var dotsContainer = section.querySelector('.carousel-indicators');
+      // Classic dots for Works section
+      var dotsContainer = section.querySelector('.works-indicators');
       if(dotsContainer) {
         var dots = dotsContainer.querySelectorAll('.dot');
         var items = c.children;
@@ -360,15 +415,17 @@
     });
   }
 
+  // --- LOGICA PULSANTE TELEFONO (Peel Off & Call) ---
   function initPhoneReveal() {
     var btn = document.querySelector('.phone-reveal');
     if (!btn) return;
 
     btn.addEventListener('click', function (e) {
-      e.preventDefault();
-      var isRevealed = btn.classList.contains('is-revealed');
-      btn.setAttribute('aria-expanded', String(!isRevealed));
-      btn.classList.toggle('is-revealed', !isRevealed);
+      if (!btn.classList.contains('is-revealed')) {
+        e.preventDefault(); // Blocca la chiamata al primo click
+        btn.classList.add('is-revealed');
+      }
+      // Al secondo click, il preventDefault non scatta e la chiamata parte
     });
   }
 
@@ -457,15 +514,52 @@
     onScroll();
   }
 
+  // Sincronizza nav desktop con lo scroll (Scroll Spy)
+  function initScrollSpy() {
+    var desktopLinks = document.querySelectorAll('.desktop-nav-wrap .nav-item-desktop');
+    if (!desktopLinks.length) return;
+    
+    var activeBubble = document.querySelector('.desktop-nav-wrap .active-bubble');
+
+    window.addEventListener('scroll', function() {
+      var scrollPos = window.scrollY + window.innerHeight / 3;
+      var currentId = '';
+      
+      desktopLinks.forEach(function(link) {
+        var section = document.querySelector(link.getAttribute('href'));
+        if (section && section.offsetTop <= scrollPos) {
+          currentId = link.getAttribute('href');
+        }
+      });
+      
+      if (currentId) {
+        var activeLink = document.querySelector('.desktop-nav-wrap a[href="' + currentId + '"]');
+        var currentActive = document.querySelector('.desktop-nav-wrap a.active');
+        if (activeLink && activeLink !== currentActive) {
+          if (currentActive) currentActive.classList.remove('active');
+          activeLink.classList.add('active');
+          
+          // Re-trigger updateBubble globally to catch the change
+          var wrap = document.querySelector('.desktop-nav-wrap');
+          activeBubble.style.width = activeLink.offsetWidth + 'px';
+          activeBubble.style.height = activeLink.offsetHeight + 'px';
+          activeBubble.style.transform = 'translate(' + activeLink.offsetLeft + 'px, ' + activeLink.offsetTop + 'px)';
+        }
+      }
+    }, { passive: true });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     initLanguage();
     initCursor();
     initAmbientMotion();
     initReveal();
+    initMotionTabs(); // Nuova funzione per le "sliding pill"
     initTimeline();
     initSwipeHints();
     initMonitor();
     initLightbox();
     initPhoneReveal();
+    initScrollSpy();
   });
 })();
