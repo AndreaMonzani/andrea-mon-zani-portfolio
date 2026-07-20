@@ -184,24 +184,27 @@
   }
 
   function initMotionTabs() {
-    var wraps = document.querySelectorAll('.nav-wrap');
+    var wraps = document.querySelectorAll('.desktop-nav-wrap, .workflow-tabs');
     
     wraps.forEach(function(wrap) {
       var activeBubble = wrap.querySelector('.active-bubble');
       var hoverBubble = wrap.querySelector('.hover-bubble');
-      var items = wrap.querySelectorAll('a, button.tab-num');
+      var items = wrap.querySelectorAll('.nav-item-desktop, .tab-num');
 
-      // Set initial state based on active class or first item
-      var activeItem = wrap.querySelector('.active') || items[0];
-      if (activeItem) {
-        activeItem.classList.add('active');
-        // Usiamo window load per calcolare le larghezze esatte DOPO il render dei font
-        window.addEventListener('load', function() {
+      function sync() {
+        var activeItem = wrap.querySelector('.active') || items[0];
+        if (activeItem && activeBubble) {
           updateBubble(activeBubble, activeItem);
-        });
-        // Ma facciamo anche un fix immediato
-        setTimeout(function() { updateBubble(activeBubble, activeItem); }, 50);
+        }
       }
+
+      // Attendiamo che i font siano caricati per non sbagliare le larghezze
+      if (document.fonts) {
+        document.fonts.ready.then(sync);
+      } else {
+        window.addEventListener('load', sync);
+      }
+      setTimeout(sync, 100);
 
       items.forEach(function(item) {
         item.addEventListener('mouseenter', function() {
@@ -223,7 +226,7 @@
     });
 
     window.addEventListener('resize', function() {
-      document.querySelectorAll('.nav-wrap').forEach(function(wrap) {
+      document.querySelectorAll('.desktop-nav-wrap, .workflow-tabs').forEach(function(wrap) {
         var activeItem = wrap.querySelector('.active');
         var activeBubble = wrap.querySelector('.active-bubble');
         if (activeItem && activeBubble) updateBubble(activeBubble, activeItem);
@@ -272,7 +275,7 @@
       }
     }
 
-    // Sync Motion Tabs and Timeline Carousel su Mobile
+    // Sync Motion Tabs with Timeline Carousel (Mobile)
     if (cinematic && workflowTabs) {
       var nums = workflowTabs.querySelectorAll('.tab-num');
       var activeBubble = workflowTabs.querySelector('.active-bubble');
@@ -287,7 +290,7 @@
           nums[index].classList.add('active');
           updateBubble(activeBubble, nums[index]);
 
-          // Autoscroll del contenitore dei tabs per tenerlo visibile
+          // Autoscroll tabs container to keep active element visible
           if (workflowTabsContainer) {
             var numOffset = nums[index].offsetLeft;
             var containerHalf = workflowTabsContainer.offsetWidth / 2;
@@ -544,9 +547,11 @@
           if (currentActive) currentActive.classList.remove('active');
           activeLink.classList.add('active');
           
-          activeBubble.style.width = activeLink.offsetWidth + 'px';
-          activeBubble.style.height = activeLink.offsetHeight + 'px';
-          activeBubble.style.transform = 'translate(' + activeLink.offsetLeft + 'px, ' + activeLink.offsetTop + 'px)';
+          if (activeBubble) {
+            activeBubble.style.width = activeLink.offsetWidth + 'px';
+            activeBubble.style.height = activeLink.offsetHeight + 'px';
+            activeBubble.style.transform = 'translate(' + activeLink.offsetLeft + 'px, ' + activeLink.offsetTop + 'px)';
+          }
         }
       }
     }, { passive: true });
