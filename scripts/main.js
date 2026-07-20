@@ -5,6 +5,10 @@
   var body = document.body;
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // Variabili per bloccare temporaneamente lo scrollSpy quando si clicca un link
+  var isClickScrolling = false;
+  var scrollTimeout;
+
   function initLanguage() {
     var buttons = document.querySelectorAll('.lang-switch');
     if (!buttons.length) return;
@@ -183,6 +187,19 @@
     bubble.style.transform = 'translate(' + target.offsetLeft + 'px, ' + target.offsetTop + 'px)';
   }
 
+  function updateHoverBubbleFull(bubble, wrap) {
+    if (!bubble) return;
+    var isDesktop = wrap.classList.contains('desktop-nav-wrap');
+    if (isDesktop) {
+      bubble.style.opacity = '1';
+      bubble.style.width = (wrap.offsetWidth - 12) + 'px'; // -12px calcola i padding laterali
+      bubble.style.height = (wrap.offsetHeight - 12) + 'px';
+      bubble.style.transform = 'translate(6px, 6px)';
+    } else {
+      bubble.style.opacity = '0'; // Non mostriamo hover bubble intero sui numeri mobile
+    }
+  }
+
   function initMotionTabs() {
     var wraps = document.querySelectorAll('.desktop-nav-wrap, .workflow-tabs');
     
@@ -196,9 +213,11 @@
         if (activeItem && activeBubble) {
           updateBubble(activeBubble, activeItem);
         }
+        if (hoverBubble) {
+          updateHoverBubbleFull(hoverBubble, wrap);
+        }
       }
 
-      // Attendiamo che i font siano caricati per non sbagliare le larghezze
       if (document.fonts) {
         document.fonts.ready.then(sync);
       } else {
@@ -211,9 +230,19 @@
           if (hoverBubble) updateBubble(hoverBubble, item);
         });
         item.addEventListener('mouseleave', function() {
-          if (hoverBubble) updateBubble(hoverBubble, null);
+          if (hoverBubble) updateHoverBubbleFull(hoverBubble, wrap);
         });
         item.addEventListener('click', function() {
+          // Quando clicca, disattiviamo scrollSpy per 1 secondo 
+          // per evitare l'effetto "saltino indietro"
+          if (item.classList.contains('nav-item-desktop')) {
+            isClickScrolling = true;
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(function() {
+              isClickScrolling = false;
+            }, 1000); 
+          }
+
           items.forEach(function(i) { i.classList.remove('active'); });
           item.classList.add('active');
           updateBubble(activeBubble, item);
@@ -221,7 +250,7 @@
       });
 
       wrap.addEventListener('mouseleave', function() {
-        if (hoverBubble) updateBubble(hoverBubble, null);
+        if (hoverBubble) updateHoverBubbleFull(hoverBubble, wrap);
       });
     });
 
@@ -275,7 +304,6 @@
       }
     }
 
-    // Sync Motion Tabs with Timeline Carousel (Mobile)
     if (cinematic && workflowTabs) {
       var nums = workflowTabs.querySelectorAll('.tab-num');
       var activeBubble = workflowTabs.querySelector('.active-bubble');
@@ -290,7 +318,6 @@
           nums[index].classList.add('active');
           updateBubble(activeBubble, nums[index]);
 
-          // Autoscroll tabs container to keep active element visible
           if (workflowTabsContainer) {
             var numOffset = nums[index].offsetLeft;
             var containerHalf = workflowTabsContainer.offsetWidth / 2;
@@ -530,6 +557,8 @@
     var activeBubble = document.querySelector('.desktop-nav-wrap .active-bubble');
 
     window.addEventListener('scroll', function() {
+      if (isClickScrolling) return; // Prevent "saltino al contrario"
+
       var scrollPos = window.scrollY + window.innerHeight / 3;
       var currentId = '';
       
