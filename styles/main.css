@@ -74,7 +74,7 @@ ul, ol { list-style: none; padding: 0; margin: 0; }
 .logo-mark a { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.1rem; }
 .logo-mark svg { width: 26px; height: 26px; }
 
-.lang-wrap { justify-self: flex-end; display: flex; align-items: center; gap: 6px; }
+.lang-wrap { justify-self: flex-end; display: flex; align-items: center; gap: 6px; z-index: 10; }
 .lang-switch { font-size: 0.85rem; color: var(--muted); padding: 0; font-weight: 500; transition: color 0.2s; }
 .lang-switch:hover { color: var(--fg); }
 .lang-switch[aria-pressed="true"] { color: var(--fg); font-weight: 700; }
@@ -109,7 +109,7 @@ ul, ol { list-style: none; padding: 0; margin: 0; }
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 24px;
+  padding: 10px 20px; /* Ridotto leggermente per farci stare il 4° elemento */
   color: var(--fg);
   text-decoration: none;
   background: transparent;
@@ -121,7 +121,7 @@ ul, ol { list-style: none; padding: 0; margin: 0; }
   font-size: 0.95rem;
   white-space: nowrap;
   outline: none;
-  line-height: 1;
+  line-height: 1; /* Fondamentale per allineamento interno e per evitare tagli */
   margin: 0;
 }
 .nav-item-desktop.active, .tab-num.active {
@@ -130,7 +130,7 @@ ul, ol { list-style: none; padding: 0; margin: 0; }
 }
 .desktop-nav-wrap .bubble, .workflow-tabs .bubble {
   position: absolute;
-  top: 0; left: 0; /* JS si occupa della pos */
+  top: 0; left: 0; /* Il posizionamento viene calcolato perfettamente dal JS */
   border-radius: 500px;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), width 0.4s cubic-bezier(0.16, 1, 0.3, 1), height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
   pointer-events: none;
@@ -458,7 +458,7 @@ body.lightbox-open { overflow: hidden; }
   }
   .workflow-tabs-container::-webkit-scrollbar { display: none; }
   
-  /* NAKED NUMBERS IN MOBILE */
+  /* NAKED NUMBERS IN MOBILE WITH MOTION TAB BUBBLE */
   .workflow-tabs { 
     position: relative;
     display: inline-flex;
@@ -484,6 +484,7 @@ body.lightbox-open { overflow: hidden; }
     line-height: 1.1;
     background: none;
     border: none;
+    margin: 0;
   }
   .workflow-tabs .tab-num.active {
     color: var(--bg);
@@ -496,7 +497,7 @@ body.lightbox-open { overflow: hidden; }
     background: var(--accent);
     box-shadow: inset 0 2px 7px rgba(255,255,255,0.4), 0 0 24px rgba(143, 121, 230, 0.6);
     border-radius: 500px;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), width 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), width 0.4s cubic-bezier(0.16, 1, 0.3, 1), height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
     top: 0; left: 0; opacity: 0;
   }
 

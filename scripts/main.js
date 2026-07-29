@@ -232,7 +232,12 @@
         item.addEventListener('mouseleave', function() {
           if (hoverBubble) updateHoverBubbleFull(hoverBubble, wrap);
         });
-        item.addEventListener('click', function() {
+        item.addEventListener('click', function(e) {
+          // Non facciamo nulla di permanente per i link esterni (es. CC Downgrader)
+          if (item.getAttribute('target') === '_blank') {
+            return;
+          }
+
           // Quando clicca, disattiviamo scrollSpy per 1 secondo 
           // per evitare l'effetto "saltino indietro"
           if (item.classList.contains('nav-item-desktop')) {
@@ -557,15 +562,18 @@
     var activeBubble = document.querySelector('.desktop-nav-wrap .active-bubble');
 
     window.addEventListener('scroll', function() {
-      if (isClickScrolling) return; // Prevent "saltino al contrario"
+      if (isClickScrolling) return; 
 
       var scrollPos = window.scrollY + window.innerHeight / 3;
       var currentId = '';
       
       desktopLinks.forEach(function(link) {
-        var section = document.querySelector(link.getAttribute('href'));
-        if (section && section.offsetTop <= scrollPos) {
-          currentId = link.getAttribute('href');
+        var href = link.getAttribute('href');
+        if (href && href.startsWith('#')) {
+          var section = document.querySelector(href);
+          if (section && section.offsetTop <= scrollPos) {
+            currentId = href;
+          }
         }
       });
       
