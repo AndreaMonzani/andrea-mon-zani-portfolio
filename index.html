@@ -7,6 +7,11 @@
   <meta name="description" content="Andrea Monzani, postproducer e producer a Milano. Montaggio, color, sound e produzione per agenzie e case di produzione.">
   <meta name="theme-color" content="#0B0B0C">
   
+  <!-- Ottimizzazione Preload -->
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+  <link rel="preload" href="./styles/main.css" as="style">
+
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-S89GVY0BV8"></script>
   <script>
@@ -17,7 +22,6 @@
   </script>
 
   <link rel="icon" href="./assets/favicon.ico">
-  <link rel="preconnect" href="https://api.fontshare.com">
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
   
@@ -133,7 +137,8 @@
         <button class="showreel-btn-massive" type="button" data-video="JB1QwI3ZMyI" data-title="Showreel Andrea Monzani" aria-label="Guarda la showreel">
           <div class="showreel-bg">
             <div class="showreel-poster-new">
-              <img src="./assets/works/andrea%20monzani.jpg" alt="Showreel Background" loading="lazy" decoding="async">
+              <!-- WebP Update -->
+              <img src="./assets/works/webp/andrea%20monzani.webp" alt="Showreel Background" width="1920" height="823" fetchpriority="high" decoding="async">
             </div>
             <div class="showreel-overlay"></div>
             <div class="dust-particles" aria-hidden="true">
@@ -182,71 +187,77 @@
       
       <div class="works-carousel-wrapper">
         <div class="works-grid">
-          <article class="work-card" data-video="fQ2Xuzze6HU" data-title="Adidas Predator — Di Marco" tabindex="0" role="button" aria-label="Apri video Adidas Predator Di Marco">
+          <button class="work-card" data-video="fQ2Xuzze6HU" data-title="Adidas Predator — Di Marco" aria-label="Apri video Adidas Predator Di Marco">
             <div class="work-thumb">
-              <img src="./assets/works/adidas-dimarco-thumb.png" alt="Adidas Predator Di Marco" loading="lazy" decoding="async">
+              <!-- WebP Update -->
+              <img src="./assets/works/webp/adidas-dimarco-thumb.webp" alt="Adidas Predator Di Marco" width="800" height="1000" loading="lazy" decoding="async">
             </div>
             <div class="work-logo">ADIDAS</div>
             <div class="work-meta">
               <h3>Predator — Di Marco</h3>
               <p>Adidas · 2025</p>
             </div>
-          </article>
+          </button>
           
-          <article class="work-card" data-video="To4Y6GsHbw0" data-title="Adidas Predator — Camarda" tabindex="0" role="button" aria-label="Apri video Adidas Predator Camarda">
+          <button class="work-card" data-video="To4Y6GsHbw0" data-title="Adidas Predator — Camarda" aria-label="Apri video Adidas Predator Camarda">
             <div class="work-thumb">
-              <img src="./assets/works/adidas-camarda-thumb.png" alt="Adidas Predator Camarda" loading="lazy" decoding="async">
+              <!-- WebP Update -->
+              <img src="./assets/works/webp/adidas-camarda-thumb.webp" alt="Adidas Predator Camarda" width="800" height="1000" loading="lazy" decoding="async">
             </div>
             <div class="work-logo">ADIDAS</div>
             <div class="work-meta">
               <h3>Predator — Camarda</h3>
               <p>Adidas · 2025</p>
             </div>
-          </article>
+          </button>
           
-          <article class="work-card" data-video="8i8Povpc_7E" data-title="DAZN — My Club Pass ADV" tabindex="0" role="button" aria-label="Apri video DAZN My Club Pass">
+          <button class="work-card" data-video="8i8Povpc_7E" data-title="DAZN — My Club Pass ADV" aria-label="Apri video DAZN My Club Pass">
             <div class="work-thumb">
-              <img src="./assets/works/dazn-thumb.png" alt="DAZN My Club Pass" loading="lazy" decoding="async">
+              <!-- WebP Update -->
+              <img src="./assets/works/webp/dazn-thumb.webp" alt="DAZN My Club Pass" width="800" height="1000" loading="lazy" decoding="async">
             </div>
             <div class="work-logo">DAZN</div>
             <div class="work-meta">
               <h3>My Club Pass ADV</h3>
               <p>DAZN · 2025</p>
             </div>
-          </article>
+          </button>
           
-          <article class="work-card" data-video="xW-SF5DesHI" data-title="Inter — My Name Is My Story" tabindex="0" role="button" aria-label="Apri video Inter">
+          <button class="work-card" data-video="xW-SF5DesHI" data-title="Inter — My Name Is My Story" aria-label="Apri video Inter">
             <div class="work-thumb">
-              <img src="./assets/works/inter-thumb.png" alt="Inter My Name Is My Story" loading="lazy" decoding="async">
+              <!-- WebP Update -->
+              <img src="./assets/works/webp/inter-thumb.webp" alt="Inter My Name Is My Story" width="800" height="1000" loading="lazy" decoding="async">
             </div>
             <div class="work-logo">INTER</div>
             <div class="work-meta">
               <h3>My Name Is My Story</h3>
               <p>Inter · 2025</p>
             </div>
-          </article>
+          </button>
           
-          <article class="work-card" data-video="zXo8YhNd9tQ" data-title="Cisalfa — Back To School" tabindex="0" role="button" aria-label="Apri video Cisalfa Back To School">
+          <button class="work-card" data-video="zXo8YhNd9tQ" data-title="Cisalfa — Back To School" aria-label="Apri video Cisalfa Back To School">
             <div class="work-thumb">
-              <img src="./assets/works/cisalfa-thumb.png" alt="Cisalfa Back To School" loading="lazy" decoding="async">
+              <!-- WebP Update -->
+              <img src="./assets/works/webp/cisalfa-thumb.webp" alt="Cisalfa Back To School" width="800" height="1000" loading="lazy" decoding="async">
             </div>
             <div class="work-logo">CISALFA</div>
             <div class="work-meta">
               <h3>Back To School</h3>
               <p>Cisalfa · 2025</p>
             </div>
-          </article>
+          </button>
           
-          <article class="work-card" data-video="DZPRdzIKZgY" data-title="Maserati — Grecale ADV" tabindex="0" role="button" aria-label="Apri video Maserati Grecale ADV">
+          <button class="work-card" data-video="DZPRdzIKZgY" data-title="Maserati — Grecale ADV" aria-label="Apri video Maserati Grecale ADV">
             <div class="work-thumb">
-              <img src="./assets/works/maserati-thumb.png" alt="Maserati Grecale ADV" loading="lazy" decoding="async">
+              <!-- WebP Update -->
+              <img src="./assets/works/webp/maserati-thumb.webp" alt="Maserati Grecale ADV" width="800" height="1000" loading="lazy" decoding="async">
             </div>
             <div class="work-logo">MASERATI</div>
             <div class="work-meta">
               <h3>Grecale ADV</h3>
               <p>Maserati · 2025</p>
             </div>
-          </article>
+          </button>
         </div>
         <!-- INDICATORI CAROSELLO MOBILE WORKS -->
         <div class="carousel-indicators works-indicators" aria-hidden="true">
@@ -368,34 +379,35 @@
       <div class="marquee-bleed">
         <div class="marquee" aria-label="Loghi clienti">
           <div class="marquee-track">
-            <div class="client-slot"><img src="./assets/logos/adidas.png" alt="Adidas"></div>
-            <div class="client-slot"><img src="./assets/logos/aprilia.png" alt="Aprilia"></div>
-            <div class="client-slot"><img src="./assets/logos/am.png" alt="Avventure nel Mondo"></div>
-            <div class="client-slot"><img src="./assets/logos/bper.png" alt="BPER"></div>
-            <div class="client-slot"><img src="./assets/logos/cisalfa.png" alt="Cisalfa"></div>
-            <div class="client-slot"><img src="./assets/logos/dazn.png" alt="DAZN"></div>
-            <div class="client-slot"><img src="./assets/logos/dude.png" alt="Dude"></div>
-            <div class="client-slot"><img src="./assets/logos/inter.png" alt="Inter"></div>
-            <div class="client-slot"><img src="./assets/logos/illy.png" alt="Illy"></div>
-            <div class="client-slot"><img src="./assets/logos/maserati.png" alt="Maserati"></div>
-            <div class="client-slot"><img src="./assets/logos/pulze.png" alt="Pulze"></div>
-            <div class="client-slot"><img src="./assets/logos/redbull.png" alt="Red Bull"></div>
-            <div class="client-slot"><img src="./assets/logos/yes-milano.png" alt="Yes Milano"></div>
+            <!-- WebP Update -->
+            <div class="client-slot"><img src="./assets/logos/webp/adidas.webp" alt="Adidas" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot"><img src="./assets/logos/webp/aprilia.webp" alt="Aprilia" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot"><img src="./assets/logos/webp/am.webp" alt="Avventure nel Mondo" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot"><img src="./assets/logos/webp/bper.webp" alt="BPER" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot"><img src="./assets/logos/webp/cisalfa.webp" alt="Cisalfa" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot"><img src="./assets/logos/webp/dazn.webp" alt="DAZN" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot"><img src="./assets/logos/webp/dude.webp" alt="Dude" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot"><img src="./assets/logos/webp/inter.webp" alt="Inter" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot"><img src="./assets/logos/webp/illy.webp" alt="Illy" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot"><img src="./assets/logos/webp/maserati.webp" alt="Maserati" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot"><img src="./assets/logos/webp/pulze.webp" alt="Pulze" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot"><img src="./assets/logos/webp/redbull.webp" alt="Red Bull" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot"><img src="./assets/logos/webp/yes-milano.webp" alt="Yes Milano" width="200" height="100" loading="lazy"></div>
             
             <!-- Duplicato per loop continuo -->
-            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/adidas.png" alt=""></div>
-            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/aprilia.png" alt=""></div>
-            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/am.png" alt=""></div>
-            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/bper.png" alt=""></div>
-            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/cisalfa.png" alt=""></div>
-            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/dazn.png" alt=""></div>
-            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/dude.png" alt=""></div>
-            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/inter.png" alt=""></div>
-            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/illy.png" alt=""></div>
-            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/maserati.png" alt=""></div>
-            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/pulze.png" alt=""></div>
-            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/redbull.png" alt=""></div>
-            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/yes-milano.png" alt=""></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/webp/adidas.webp" alt="" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/webp/aprilia.webp" alt="" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/webp/am.webp" alt="" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/webp/bper.webp" alt="" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/webp/cisalfa.webp" alt="" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/webp/dazn.webp" alt="" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/webp/dude.webp" alt="" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/webp/inter.webp" alt="" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/webp/illy.webp" alt="" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/webp/maserati.webp" alt="" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/webp/pulze.webp" alt="" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/webp/redbull.webp" alt="" width="200" height="100" loading="lazy"></div>
+            <div class="client-slot" aria-hidden="true"><img src="./assets/logos/webp/yes-milano.webp" alt="" width="200" height="100" loading="lazy"></div>
           </div>
         </div>
       </div>
@@ -411,7 +423,6 @@
         <span class="en">For projects, collaborations, or to discuss your next campaign.</span>
       </p>
       <div class="contact-row">
-        <!-- PULSANTE TELEFONO CLICCABILE CON EFFETTO PEEL OFF E LINK DIRETTO -->
         <a href="tel:+393460501159" class="phone-reveal" aria-expanded="false">
           <span class="num">346 050 1159</span>
           <span class="peel-overlay">
