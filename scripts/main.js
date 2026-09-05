@@ -192,11 +192,11 @@
     var isDesktop = wrap.classList.contains('desktop-nav-wrap');
     if (isDesktop) {
       bubble.style.opacity = '1';
-      bubble.style.width = (wrap.offsetWidth - 12) + 'px'; // -12px calcola i padding laterali
+      bubble.style.width = (wrap.offsetWidth - 12) + 'px'; 
       bubble.style.height = (wrap.offsetHeight - 12) + 'px';
       bubble.style.transform = 'translate(6px, 6px)';
     } else {
-      bubble.style.opacity = '0'; // Non mostriamo hover bubble intero sui numeri mobile
+      bubble.style.opacity = '0'; 
     }
   }
 
@@ -233,13 +233,10 @@
           if (hoverBubble) updateHoverBubbleFull(hoverBubble, wrap);
         });
         item.addEventListener('click', function(e) {
-          // Non facciamo nulla di permanente per i link esterni (es. CC Downgrader)
           if (item.getAttribute('target') === '_blank') {
             return;
           }
 
-          // Quando clicca, disattiviamo scrollSpy per 1 secondo 
-          // per evitare l'effetto "saltino indietro"
           if (item.classList.contains('nav-item-desktop')) {
             isClickScrolling = true;
             clearTimeout(scrollTimeout);
@@ -464,7 +461,6 @@
 
     btn.addEventListener('click', function (e) {
       if (!btn.classList.contains('is-revealed')) {
-        e.preventDefault(); 
         btn.classList.add('is-revealed');
       }
     });
