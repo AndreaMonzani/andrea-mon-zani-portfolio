@@ -9,32 +9,63 @@
 
   function clamp(v, min, max) { return Math.min(Math.max(v, min), max); }
 
-  /* 1. LANGUAGE SWITCHER */
+  /* 1. NON-BLOCKING INTRO CURTAIN */
+  function initIntroCurtain() {
+    var curtain = document.getElementById('introCurtain');
+    var tc = document.getElementById('introTimecode');
+    if (!curtain) return;
+
+    if (reduceMotion || sessionStorage.getItem('am_intro_seen')) {
+      curtain.remove();
+      return;
+    }
+
+    var isMobile = window.innerWidth <= 600;
+    var duration = isMobile ? 280 : 620;
+    var start = performance.now();
+
+    function tick(now) {
+      var p = clamp((now - start) / duration, 0, 1);
+      if (tc) {
+        var frames = Math.floor(p * 24);
+        var fStr = frames < 10 ? '0' + frames : String(frames);
+        tc.textContent = p < 1 ? '00:00:00:' + fStr : '00:00:01:00';
+      }
+      if (p < 1) {
+        requestAnimationFrame(tick);
+      } else {
+        curtain.classList.add('is-done');
+        sessionStorage.setItem('am_intro_seen', '1');
+        setTimeout(function () { curtain.remove(); }, 800);
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  /* 2. LANGUAGE SWITCHER */
   function initLanguage() {
     var buttons = document.querySelectorAll('.lang-switch');
     if (!buttons.length) return;
 
     function syncButtons() {
       var isEn = root.classList.contains('lang-en');
-      buttons.forEach(function (button) {
-        var active = button.getAttribute('data-lang') === (isEn ? 'en' : 'it');
-        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+      buttons.forEach(function (btn) {
+        btn.setAttribute('aria-pressed', btn.getAttribute('data-lang') === (isEn ? 'en' : 'it') ? 'true' : 'false');
       });
     }
 
-    buttons.forEach(function (button) {
-      button.addEventListener('click', function () {
-        var lang = button.getAttribute('data-lang');
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var lang = btn.getAttribute('data-lang');
         root.classList.toggle('lang-en', lang === 'en');
         root.setAttribute('lang', lang);
         syncButtons();
       });
     });
-
     syncButtons();
   }
 
-  /* 2. SHAKE-TO-INVERT + HEADER TOGGLE */
+  /* 3. SHAKE-TO-INVERT + HEADER TOGGLE */
   function initThemeAndShake() {
     var toggleBtn = document.getElementById('themeToggle');
     var lastShake = 0;
@@ -67,8 +98,7 @@
               window.addEventListener('devicemotion', onDeviceMotion, { passive: true });
               shakeAttached = true;
             }
-          })
-          .catch(function () {});
+          }).catch(function () {});
       } else {
         window.addEventListener('devicemotion', onDeviceMotion, { passive: true });
         shakeAttached = true;
@@ -87,31 +117,85 @@
     }
   }
 
-  /* 3. CUSTOM CURSOR */
+  /* 4. HERO SPOTLIGHT STAGE + TRACKLIST */
+  function initHeroStage() {
+    var stage = document.getElementById('heroStage');
+    var stageImg = document.getElementById('heroStageImg');
+    var stageTitle = document.getElementById('heroStageTitle');
+    var stageMeta = document.getElementById('heroStageMeta');
+    var items = document.querySelectorAll('#heroTracklist .track-item');
+    if (!stage || !items.length) return;
+
+    function selectTrack(item) {
+      items.forEach(function (i) {
+        var active = i === item;
+        i.classList.toggle('is-active', active);
+        i.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+
+      var newThumb = item.getAttribute('data-thumb');
+      var newTitle = item.getAttribute('data-title');
+      var newMeta = item.getAttribute('data-meta');
+      var newVideo = item.getAttribute('data-video');
+
+      stage.setAttribute('data-video', newVideo);
+      stage.setAttribute('data-title', newTitle);
+      stage.setAttribute('aria-label', 'Riproduci ' + newTitle);
+      if (stageTitle) stageTitle.textContent = newTitle;
+      if (stageMeta) stageMeta.textContent = newMeta;
+
+      if (stageImg && stageImg.getAttribute('src') !== newThumb) {
+        stageImg.classList.add('is-swapping');
+        setTimeout(function () {
+          stageImg.src = newThumb;
+          stageImg.alt = newTitle;
+          stageImg.classList.remove('is-swapping');
+        }, 120);
+      }
+    }
+
+    items.forEach(function (item) {
+      item.addEventListener('mouseenter', function () { selectTrack(item); });
+      item.addEventListener('click', function () { selectTrack(item); });
+    });
+
+    // Micro-tilt & luce radente solo su desktop con mouse
+    if (!reduceMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      stage.addEventListener('pointerenter', function () { stage.classList.add('is-tilting'); });
+      stage.addEventListener('pointermove', function (e) {
+        var rect = stage.getBoundingClientRect();
+        var relX = clamp((e.clientX - rect.left) / rect.width, 0, 1);
+        var relY = clamp((e.clientY - rect.top) / rect.height, 0, 1);
+        stage.style.setProperty('--rx', ((0.5 - relY) * 7).toFixed(2) + 'deg');
+        stage.style.setProperty('--ry', ((relX - 0.5) * 7).toFixed(2) + 'deg');
+        stage.style.setProperty('--mx', (relX * 100).toFixed(1) + '%');
+        stage.style.setProperty('--my', (relY * 100).toFixed(1) + '%');
+      });
+      stage.addEventListener('pointerleave', function () {
+        stage.classList.remove('is-tilting');
+        stage.style.setProperty('--rx', '0deg');
+        stage.style.setProperty('--ry', '0deg');
+      });
+    }
+  }
+
+  /* 5. CUSTOM CURSOR & AMBIENT GRADIENT */
   function initCursor() {
     var cursor = document.querySelector('.cursor');
     if (!cursor || 'ontouchstart' in window) {
       if (cursor) cursor.style.display = 'none';
       return;
     }
-
     var ring = cursor.querySelector('.cursor-ring');
     var dot = cursor.querySelector('.cursor-dot');
     var label = cursor.querySelector('.cursor-label');
     var visible = false;
-    var mouseX = window.innerWidth / 2;
-    var mouseY = window.innerHeight / 2;
-    var ringX = mouseX;
-    var ringY = mouseY;
-    var ringScale = 1;
+    var mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+    var ringX = mouseX, ringY = mouseY, ringScale = 1;
 
     window.addEventListener('mousemove', function (e) {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      if (!visible) {
-        cursor.classList.add('cursor--visible');
-        visible = true;
-      }
+      mouseX = e.clientX; mouseY = e.clientY;
+      if (!visible) { cursor.classList.add('cursor--visible'); visible = true; }
     }, { passive: true });
 
     function renderCursor() {
@@ -124,257 +208,143 @@
     }
     requestAnimationFrame(renderCursor);
 
-    document.querySelectorAll('.showreel-btn-massive, [data-video]').forEach(function (el) {
+    document.querySelectorAll('[data-video]').forEach(function (el) {
       el.addEventListener('mouseenter', function () { cursor.classList.add('cursor--play'); });
       el.addEventListener('mouseleave', function () { cursor.classList.remove('cursor--play'); });
     });
-
-    document.querySelectorAll('a:not([data-video]), button:not(.showreel-btn-massive):not([data-video])').forEach(function (el) {
+    document.querySelectorAll('a:not([data-video]), button:not([data-video])').forEach(function (el) {
       el.addEventListener('mouseenter', function () { cursor.classList.add('cursor--active'); });
       el.addEventListener('mouseleave', function () { cursor.classList.remove('cursor--active'); });
     });
-
     body.addEventListener('mousedown', function () { ringScale = 0.92; });
     body.addEventListener('mouseup', function () { ringScale = 1; });
   }
 
-  /* 4. AMBIENT GRADIENT MOTION */
   function initAmbientMotion() {
     if (reduceMotion) return;
-    var currentX = window.innerWidth * 0.5;
-    var currentY = window.innerHeight * 0.25;
-    var targetX = currentX;
-    var targetY = currentY;
-    var currentScroll = 0;
-    var targetScroll = 0;
-    var ticking = false;
+    var cx = window.innerWidth * 0.5, cy = window.innerHeight * 0.25;
+    var tx = cx, ty = cy, ticking = false;
 
     function render() {
-      currentX += (targetX - currentX) * 0.06;
-      currentY += (targetY - currentY) * 0.06;
-      currentScroll += (targetScroll - currentScroll) * 0.08;
-      root.style.setProperty('--pointer-x', ((currentX / window.innerWidth) * 100).toFixed(2) + '%');
-      root.style.setProperty('--pointer-y', ((currentY / window.innerHeight) * 100).toFixed(2) + '%');
-      root.style.setProperty('--scroll-shift', (currentScroll * 0.12).toFixed(2) + 'px');
-
-      if (Math.abs(targetX - currentX) > 0.1 || Math.abs(targetY - currentY) > 0.1 || Math.abs(targetScroll - currentScroll) > 0.1) {
-        requestAnimationFrame(render);
-      } else {
-        ticking = false;
-      }
-    }
-
-    function requestTick() {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(render);
-      }
+      cx += (tx - cx) * 0.06; cy += (ty - cy) * 0.06;
+      root.style.setProperty('--pointer-x', ((cx / window.innerWidth) * 100).toFixed(2) + '%');
+      root.style.setProperty('--pointer-y', ((cy / window.innerHeight) * 100).toFixed(2) + '%');
+      if (Math.abs(tx - cx) > 0.1 || Math.abs(ty - cy) > 0.1) requestAnimationFrame(render);
+      else ticking = false;
     }
 
     window.addEventListener('mousemove', function (e) {
-      targetX = e.clientX;
-      targetY = e.clientY;
-      requestTick();
+      tx = e.clientX; ty = e.clientY;
+      if (!ticking) { ticking = true; requestAnimationFrame(render); }
     }, { passive: true });
-
-    window.addEventListener('scroll', function () {
-      targetScroll = window.scrollY || window.pageYOffset;
-      requestTick();
-    }, { passive: true });
-
-    requestTick();
   }
 
-  /* 5. HERO 3D EDITORIAL GRID — TILT INTERNO CONTROLLATO (SOLO DESKTOP) */
-  function initHeroBlades() {
-    var cards = document.querySelectorAll('#heroBlades .blade-card');
-    if (!cards.length || reduceMotion) return;
-    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-
-    var maxTilt = 6; // Inclinazione elegante e controllata
-
-    cards.forEach(function (card) {
-      card.addEventListener('pointerenter', function () {
-        card.classList.add('is-tilting');
-      });
-
-      card.addEventListener('pointermove', function (e) {
-        var rect = card.getBoundingClientRect();
-        var relX = clamp((e.clientX - rect.left) / rect.width, 0, 1);
-        var relY = clamp((e.clientY - rect.top) / rect.height, 0, 1);
-
-        var rx = (0.5 - relY) * (maxTilt * 2);
-        var ry = (relX - 0.5) * (maxTilt * 2);
-
-        card.style.setProperty('--rx', rx.toFixed(2) + 'deg');
-        card.style.setProperty('--ry', ry.toFixed(2) + 'deg');
-        card.style.setProperty('--mx', (relX * 100).toFixed(1) + '%');
-        card.style.setProperty('--my', (relY * 100).toFixed(1) + '%');
-      });
-
-      card.addEventListener('pointerleave', function () {
-        card.classList.remove('is-tilting');
-        card.style.setProperty('--rx', '0deg');
-        card.style.setProperty('--ry', '0deg');
-        card.style.setProperty('--mx', '50%');
-        card.style.setProperty('--my', '50%');
-      });
-    });
-  }
-
-  /* 6. REVEAL */
-  function initReveal() {
-    var els = document.querySelectorAll('[data-reveal]');
-    if (!els.length) return;
-    if (!('IntersectionObserver' in window) || reduceMotion) {
-      els.forEach(function (el) { el.classList.add('is-visible'); });
-      return;
-    }
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          io.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.2 });
-    els.forEach(function (el) { io.observe(el); });
-  }
-
-  /* 7. MOTION TABS */
+  /* 6. MOTION TABS DESKTOP & SCROLLSPY */
   function updateBubble(bubble, target) {
-    if (!bubble) return;
-    if (!target) { bubble.style.opacity = '0'; return; }
+    if (!bubble || !target) return;
     bubble.style.opacity = '1';
     bubble.style.width = target.offsetWidth + 'px';
     bubble.style.height = target.offsetHeight + 'px';
     bubble.style.transform = 'translate(' + target.offsetLeft + 'px, ' + target.offsetTop + 'px)';
   }
 
-  function updateHoverBubbleFull(bubble, wrap) {
-    if (!bubble) return;
-    if (wrap.classList.contains('desktop-nav-wrap')) {
-      bubble.style.opacity = '1';
-      bubble.style.width = (wrap.offsetWidth - 12) + 'px';
-      bubble.style.height = (wrap.offsetHeight - 12) + 'px';
-      bubble.style.transform = 'translate(6px, 6px)';
-    } else {
-      bubble.style.opacity = '0';
-    }
-  }
-
   function initMotionTabs() {
-    var wraps = document.querySelectorAll('.desktop-nav-wrap, .workflow-tabs');
-    wraps.forEach(function (wrap) {
-      var activeBubble = wrap.querySelector('.active-bubble');
-      var hoverBubble = wrap.querySelector('.hover-bubble');
-      var items = wrap.querySelectorAll('.nav-item-desktop, .tab-num');
+    var wrap = document.querySelector('.desktop-nav-wrap');
+    if (!wrap) return;
+    var activeBubble = wrap.querySelector('.active-bubble');
+    var hoverBubble = wrap.querySelector('.hover-bubble');
+    var items = wrap.querySelectorAll('.nav-item-desktop');
 
-      function sync() {
-        var activeItem = wrap.querySelector('.active') || items[0];
-        if (activeItem && activeBubble) updateBubble(activeBubble, activeItem);
-        if (hoverBubble) updateHoverBubbleFull(hoverBubble, wrap);
-      }
+    function sync() {
+      var activeItem = wrap.querySelector('.active') || items[0];
+      updateBubble(activeBubble, activeItem);
+      if (hoverBubble) hoverBubble.style.opacity = '0';
+    }
 
-      if (document.fonts) document.fonts.ready.then(sync);
-      else window.addEventListener('load', sync);
-      setTimeout(sync, 120);
+    if (document.fonts) document.fonts.ready.then(sync);
+    setTimeout(sync, 120);
 
-      items.forEach(function (item) {
-        item.addEventListener('mouseenter', function () {
-          if (hoverBubble) updateBubble(hoverBubble, item);
-        });
-        item.addEventListener('mouseleave', function () {
-          if (hoverBubble) updateHoverBubbleFull(hoverBubble, wrap);
-        });
-        item.addEventListener('click', function () {
-          if (item.getAttribute('target') === '_blank') return;
-          if (item.classList.contains('nav-item-desktop')) {
-            isClickScrolling = true;
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(function () { isClickScrolling = false; }, 1000);
-          }
-          items.forEach(function (i) { i.classList.remove('active'); });
-          item.classList.add('active');
-          updateBubble(activeBubble, item);
-        });
-      });
-
-      wrap.addEventListener('mouseleave', function () {
-        if (hoverBubble) updateHoverBubbleFull(hoverBubble, wrap);
+    items.forEach(function (item) {
+      item.addEventListener('mouseenter', function () { updateBubble(hoverBubble, item); });
+      item.addEventListener('click', function () {
+        if (item.getAttribute('target') === '_blank') return;
+        isClickScrolling = true;
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(function () { isClickScrolling = false; }, 900);
+        items.forEach(function (i) { i.classList.remove('active'); });
+        item.classList.add('active');
+        updateBubble(activeBubble, item);
       });
     });
+    wrap.addEventListener('mouseleave', function () { if (hoverBubble) hoverBubble.style.opacity = '0'; });
+    window.addEventListener('resize', sync, { passive: true });
 
-    window.addEventListener('resize', function () {
-      document.querySelectorAll('.desktop-nav-wrap, .workflow-tabs').forEach(function (wrap) {
-        var activeItem = wrap.querySelector('.active');
-        var activeBubble = wrap.querySelector('.active-bubble');
-        if (activeItem && activeBubble) updateBubble(activeBubble, activeItem);
+    window.addEventListener('scroll', function () {
+      if (isClickScrolling) return;
+      var scrollPos = window.scrollY + window.innerHeight / 3;
+      var currentId = '';
+      items.forEach(function (link) {
+        var href = link.getAttribute('href');
+        if (href && href.startsWith('#')) {
+          var sec = document.querySelector(href);
+          if (sec && sec.offsetTop <= scrollPos) currentId = href;
+        }
       });
+      if (currentId) {
+        var activeLink = wrap.querySelector('a[href="' + currentId + '"]');
+        var cur = wrap.querySelector('a.active');
+        if (activeLink && activeLink !== cur) {
+          if (cur) cur.classList.remove('active');
+          activeLink.classList.add('active');
+          updateBubble(activeBubble, activeLink);
+        }
+      }
     }, { passive: true });
   }
 
-  /* 8. TIMELINE */
+  /* 7. TIMELINE DESKTOP + SCRUBBER MOBILE (ANDROID FIX) */
   function initTimeline() {
     var workflow = document.getElementById('workflow');
+    var track = document.getElementById('timelineTrack');
     var steps = document.querySelectorAll('.timeline-step');
     var progress = document.getElementById('timelineProgress');
-    var glow = document.querySelector('.timeline-axis-glow');
-    var cinematic = document.querySelector('.timeline-cinematic');
-    var workflowTabs = document.querySelector('.workflow-tabs');
-    var workflowTabsContainer = document.querySelector('.workflow-tabs-container');
+    var pills = document.querySelectorAll('#processScrubber .scrubber-pill');
     if (!workflow || !steps.length) return;
 
     function updateDesktop() {
-      if (window.innerWidth > 600 && progress && glow) {
-        var rect = workflow.getBoundingClientRect();
-        var vh = window.innerHeight || root.clientHeight;
-        var ratio = clamp((vh * 0.72 - rect.top) / (rect.height + vh * 0.35), 0, 1);
-        progress.style.height = (ratio * 100) + '%';
-        glow.style.top = 'calc(' + (ratio * 100) + '% - 60px)';
+      if (window.innerWidth <= 600 || !progress) return;
+      var rect = workflow.getBoundingClientRect();
+      var vh = window.innerHeight || root.clientHeight;
+      var ratio = clamp((vh * 0.72 - rect.top) / (rect.height + vh * 0.3), 0, 1);
+      progress.style.height = (ratio * 100) + '%';
 
-        var viewportMid = vh * 0.48;
-        var activeIndex = 0;
-        var minDistance = Infinity;
-        steps.forEach(function (step, index) {
-          var stepRect = step.getBoundingClientRect();
-          var distance = Math.abs(viewportMid - (stepRect.top + stepRect.height / 2));
-          if (distance < minDistance) { minDistance = distance; activeIndex = index; }
-        });
-        steps.forEach(function (step, index) {
-          step.classList.toggle('is-active', index === activeIndex && rect.top < vh && rect.bottom > 0);
-        });
-      }
+      var mid = vh * 0.48, activeIdx = 0, minD = Infinity;
+      steps.forEach(function (s, i) {
+        var r = s.getBoundingClientRect();
+        var d = Math.abs(mid - (r.top + r.height / 2));
+        if (d < minD) { minD = d; activeIdx = i; }
+      });
+      steps.forEach(function (s, i) { s.classList.toggle('is-active', i === activeIdx); });
     }
 
-    if (cinematic && workflowTabs) {
-      var nums = workflowTabs.querySelectorAll('.tab-num');
-      var activeBubble = workflowTabs.querySelector('.active-bubble');
-      cinematic.addEventListener('scroll', function () {
-        if (window.innerWidth > 600) return;
-        var cardWidth = cinematic.children[0].offsetWidth;
-        var index = Math.round(cinematic.scrollLeft / (cardWidth + 16));
-        if (nums[index] && !nums[index].classList.contains('active')) {
-          nums.forEach(function (n) { n.classList.remove('active'); });
-          nums[index].classList.add('active');
-          updateBubble(activeBubble, nums[index]);
-          if (workflowTabsContainer) {
-            var numOffset = nums[index].offsetLeft;
-            workflowTabsContainer.scrollTo({ left: numOffset - workflowTabsContainer.offsetWidth / 2 + nums[index].offsetWidth / 2, behavior: 'smooth' });
-          }
-        }
-      }, { passive: true });
-      nums.forEach(function (num, i) {
-        num.addEventListener('click', function () {
-          cinematic.scrollTo({ left: i * (cinematic.children[0].offsetWidth + 16), behavior: 'smooth' });
+    // Mobile Scrubber
+    if (track && pills.length) {
+      pills.forEach(function (pill, idx) {
+        pill.addEventListener('click', function () {
+          var targetStep = steps[idx];
+          if (targetStep) track.scrollTo({ left: targetStep.offsetLeft, behavior: 'smooth' });
         });
       });
-    }
 
-    if (reduceMotion) {
-      steps.forEach(function (step) { step.classList.add('is-active'); });
-      if (progress) progress.style.height = '100%';
-      return;
+      track.addEventListener('scroll', function () {
+        if (window.innerWidth > 600) return;
+        var cardW = steps[0].offsetWidth + 14;
+        var idx = clamp(Math.round(track.scrollLeft / cardW), 0, pills.length - 1);
+        pills.forEach(function (p, i) {
+          p.classList.toggle('is-active', i === idx);
+          p.setAttribute('aria-selected', i === idx ? 'true' : 'false');
+        });
+      }, { passive: true });
     }
 
     window.addEventListener('scroll', updateDesktop, { passive: true });
@@ -382,133 +352,72 @@
     updateDesktop();
   }
 
-  /* 9. SWIPE HINTS */
-  function initSwipeHints() {
-    document.querySelectorAll('.works-grid, .timeline-cinematic').forEach(function (c) {
-      var section = c.closest('section');
-      if (!section) return;
-      var hint = section.querySelector('.swipe-hint');
-      c.addEventListener('scroll', function () {
-        if (hint && c.scrollLeft > 20) hint.classList.add('is-hidden');
-      }, { passive: true });
-
-      var dotsContainer = section.querySelector('.works-indicators');
-      if (dotsContainer) {
-        var dots = dotsContainer.querySelectorAll('.dot');
-        var items = c.children;
-        if (dots.length && items.length) {
-          c.addEventListener('scroll', function () {
-            var index = Math.round(c.scrollLeft / (items[0].offsetWidth + 16));
-            dots.forEach(function (d, i) { d.classList.toggle('active', i === index); });
-          }, { passive: true });
-        }
-      }
-    });
-  }
-
-  /* 10. LIGHTBOX */
-  function openVideo(videoId, title, lightbox, frameNode, closeBtnNode) {
-    Array.from(frameNode.children).forEach(function (node) {
-      if (node !== closeBtnNode) frameNode.removeChild(node);
-    });
-    var iframe = document.createElement('iframe');
-    iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0&playsinline=1';
-    iframe.title = title || 'Video';
-    iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
-    iframe.setAttribute('allowfullscreen', 'true');
-    iframe.setAttribute('frameborder', '0');
-
-    frameNode.insertBefore(iframe, closeBtnNode);
-    lightbox.setAttribute('aria-hidden', 'false');
-    body.classList.add('lightbox-open');
-    window.setTimeout(function () { closeBtnNode.focus(); }, 60);
-  }
-
+  /* 8. LIGHTBOX YOUTUBE ON-DEMAND */
   function initLightbox() {
     var triggers = document.querySelectorAll('[data-video]');
     var lightbox = document.getElementById('lightbox');
     if (!triggers.length || !lightbox) return;
     var frameNode = lightbox.querySelector('.lightbox-frame');
-    var closeBtnNode = lightbox.querySelector('.lightbox-close');
+    var closeBtn = lightbox.querySelector('.lightbox-close');
     var lastFocused = null;
+
+    function openVideo(videoId, title) {
+      Array.from(frameNode.children).forEach(function (n) { if (n !== closeBtn) frameNode.removeChild(n); });
+      var iframe = document.createElement('iframe');
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId + '?autoplay=1&rel=0&playsinline=1';
+      iframe.title = title || 'Video';
+      iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+      iframe.setAttribute('allowfullscreen', 'true');
+      frameNode.insertBefore(iframe, closeBtn);
+      lightbox.setAttribute('aria-hidden', 'false');
+      body.classList.add('lightbox-open');
+      setTimeout(function () { closeBtn.focus(); }, 60);
+    }
 
     function close() {
       lightbox.setAttribute('aria-hidden', 'true');
       body.classList.remove('lightbox-open');
-      Array.from(frameNode.children).forEach(function (node) {
-        if (node !== closeBtnNode) frameNode.removeChild(node);
-      });
+      Array.from(frameNode.children).forEach(function (n) { if (n !== closeBtn) frameNode.removeChild(n); });
       if (lastFocused) lastFocused.focus();
     }
 
-    triggers.forEach(function (trigger) {
-      trigger.addEventListener('click', function () {
-        lastFocused = trigger;
-        openVideo(trigger.getAttribute('data-video'), trigger.getAttribute('data-title'), lightbox, frameNode, closeBtnNode);
+    triggers.forEach(function (t) {
+      t.addEventListener('click', function () {
+        lastFocused = t;
+        openVideo(t.getAttribute('data-video'), t.getAttribute('data-title'));
       });
     });
-
-    closeBtnNode.addEventListener('click', close);
+    closeBtn.addEventListener('click', close);
     lightbox.addEventListener('click', function (e) { if (e.target === lightbox) close(); });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && lightbox.getAttribute('aria-hidden') === 'false') close();
     });
   }
 
-  /* 11. PHONE PEEL-OFF */
+  /* 9. GAFFER TAPE PEEL-OFF (Touch-Friendly Android) */
   function initPhoneReveal() {
-    var btn = document.querySelector('.phone-reveal');
+    var btn = document.getElementById('phoneReveal');
     if (!btn) return;
     btn.addEventListener('click', function (e) {
       if (!btn.classList.contains('is-revealed')) {
         e.preventDefault();
         btn.classList.add('is-revealed');
         btn.setAttribute('aria-expanded', 'true');
+        if (navigator.vibrate) navigator.vibrate(15);
       }
     });
   }
 
-  /* 12. SCROLLSPY */
-  function initScrollSpy() {
-    var desktopLinks = document.querySelectorAll('.desktop-nav-wrap .nav-item-desktop');
-    if (!desktopLinks.length) return;
-    var activeBubble = document.querySelector('.desktop-nav-wrap .active-bubble');
-
-    window.addEventListener('scroll', function () {
-      if (isClickScrolling) return;
-      var scrollPos = window.scrollY + window.innerHeight / 3;
-      var currentId = '';
-      desktopLinks.forEach(function (link) {
-        var href = link.getAttribute('href');
-        if (href && href.startsWith('#')) {
-          var section = document.querySelector(href);
-          if (section && section.offsetTop <= scrollPos) currentId = href;
-        }
-      });
-      if (currentId) {
-        var activeLink = document.querySelector('.desktop-nav-wrap a[href="' + currentId + '"]');
-        var currentActive = document.querySelector('.desktop-nav-wrap a.active');
-        if (activeLink && activeLink !== currentActive) {
-          if (currentActive) currentActive.classList.remove('active');
-          activeLink.classList.add('active');
-          if (activeBubble) updateBubble(activeBubble, activeLink);
-        }
-      }
-    }, { passive: true });
-  }
-
   document.addEventListener('DOMContentLoaded', function () {
+    initIntroCurtain();
     initLanguage();
     initThemeAndShake();
+    initHeroStage();
     initCursor();
     initAmbientMotion();
-    initHeroBlades();
-    initReveal();
     initMotionTabs();
     initTimeline();
-    initSwipeHints();
     initLightbox();
     initPhoneReveal();
-    initScrollSpy();
   });
 })();
