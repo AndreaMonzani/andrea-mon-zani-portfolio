@@ -140,7 +140,7 @@
     });
   }
 
-  /* 5. STICKY HORIZONTAL SHOWCASE (LANDO NORRIS / PASSIONFROOT RHYTHM) */
+  /* 5. STICKY HORIZONTAL SHOWCASE */
   function initStickyShowcase() {
     var section = document.getElementById('lavori');
     var track = document.getElementById('showcaseTrack');
@@ -167,23 +167,14 @@
         rafId = null;
         return;
       }
-
       currentX += (targetX - currentX) * (reduceMotion ? 1 : 0.12);
       track.style.transform = 'translate3d(' + (-currentX).toFixed(1) + 'px, 0, 0)';
-
-      if (Math.abs(targetX - currentX) > 0.25) {
-        rafId = requestAnimationFrame(renderShowcase);
-      } else {
-        rafId = null;
-      }
+      if (Math.abs(targetX - currentX) > 0.25) rafId = requestAnimationFrame(renderShowcase);
+      else rafId = null;
     }
 
     function onScroll() {
-      if (window.innerWidth <= 980) {
-        track.style.transform = '';
-        return;
-      }
-
+      if (window.innerWidth <= 980) { track.style.transform = ''; return; }
       var rect = section.getBoundingClientRect();
       var scrollable = section.offsetHeight - window.innerHeight;
       if (scrollable <= 0) return;
@@ -197,11 +188,7 @@
         var totStr = totalCards < 10 ? '0' + totalCards : String(totalCards);
         counter.textContent = numStr + ' / ' + totStr;
       }
-      if (fill) {
-        var pct = ((activeIdx + 1) / totalCards) * 100;
-        fill.style.width = pct.toFixed(1) + '%';
-      }
-
+      if (fill) fill.style.width = (((activeIdx + 1) / totalCards) * 100).toFixed(1) + '%';
       if (!rafId) rafId = requestAnimationFrame(renderShowcase);
     }
 
@@ -333,21 +320,23 @@
     }, { passive: true });
   }
 
-  /* 8. TIMELINE DESKTOP + SCRUBBER MOBILE (ANDROID FIX) */
+  /* 8. VECCHIA TIMELINE A SCORRIMENTO (DESKTOP) + SCRUBBER MOBILE */
   function initTimeline() {
     var workflow = document.getElementById('workflow');
     var track = document.getElementById('timelineTrack');
     var steps = document.querySelectorAll('.timeline-step');
     var progress = document.getElementById('timelineProgress');
+    var glow = document.querySelector('.timeline-axis-glow');
     var pills = document.querySelectorAll('#processScrubber .scrubber-pill');
     if (!workflow || !steps.length) return;
 
     function updateDesktop() {
-      if (window.innerWidth <= 600 || !progress) return;
+      if (window.innerWidth <= 980 || !progress) return;
       var rect = workflow.getBoundingClientRect();
       var vh = window.innerHeight || root.clientHeight;
-      var ratio = clamp((vh * 0.72 - rect.top) / (rect.height + vh * 0.3), 0, 1);
+      var ratio = clamp((vh * 0.72 - rect.top) / (rect.height + vh * 0.35), 0, 1);
       progress.style.height = (ratio * 100) + '%';
+      if (glow) glow.style.top = 'calc(' + (ratio * 100) + '% - 60px)';
 
       var mid = vh * 0.48, activeIdx = 0, minD = Infinity;
       steps.forEach(function (s, i) {
@@ -355,7 +344,9 @@
         var d = Math.abs(mid - (r.top + r.height / 2));
         if (d < minD) { minD = d; activeIdx = i; }
       });
-      steps.forEach(function (s, i) { s.classList.toggle('is-active', i === activeIdx); });
+      steps.forEach(function (s, i) {
+        s.classList.toggle('is-active', i === activeIdx && rect.top < vh && rect.bottom > 0);
+      });
     }
 
     if (track && pills.length) {
@@ -424,7 +415,7 @@
     });
   }
 
-  /* 10. GAFFER TAPE PEEL-OFF (Animazione visibile anche su Android Touch) */
+  /* 10. GAFFER TAPE PEEL-OFF */
   function initPhoneReveal() {
     var btn = document.getElementById('phoneReveal');
     if (!btn) return;
