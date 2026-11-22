@@ -21,7 +21,7 @@
     }
 
     var isMobile = window.innerWidth <= 600;
-    var duration = isMobile ? 280 : 620;
+    var duration = isMobile ? 260 : 600;
     var start = performance.now();
 
     function tick(now) {
@@ -36,7 +36,7 @@
       } else {
         curtain.classList.add('is-done');
         sessionStorage.setItem('am_intro_seen', '1');
-        setTimeout(function () { curtain.remove(); }, 800);
+        setTimeout(function () { curtain.remove(); }, 760);
       }
     }
     requestAnimationFrame(tick);
@@ -75,7 +75,7 @@
       var isInverted = root.classList.toggle('theme-inverted');
       if (toggleBtn) toggleBtn.setAttribute('aria-pressed', isInverted ? 'true' : 'false');
       var metaTheme = document.querySelector('meta[name="theme-color"]');
-      if (metaTheme) metaTheme.setAttribute('content', isInverted ? '#EFEDE8' : '#0B0B0C');
+      if (metaTheme) metaTheme.setAttribute('content', isInverted ? '#EFEDE8' : '#09090B');
     }
 
     function onDeviceMotion(e) {
@@ -117,69 +117,100 @@
     }
   }
 
-  /* 4. HERO SPOTLIGHT STAGE + TRACKLIST */
+  /* 4. HERO STAGE MICRO-TILT (DESKTOP) */
   function initHeroStage() {
     var stage = document.getElementById('heroStage');
-    var stageImg = document.getElementById('heroStageImg');
-    var stageTitle = document.getElementById('heroStageTitle');
-    var stageMeta = document.getElementById('heroStageMeta');
-    var items = document.querySelectorAll('#heroTracklist .track-item');
-    if (!stage || !items.length) return;
+    if (!stage || reduceMotion) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
-    function selectTrack(item) {
-      items.forEach(function (i) {
-        var active = i === item;
-        i.classList.toggle('is-active', active);
-        i.setAttribute('aria-selected', active ? 'true' : 'false');
-      });
+    stage.addEventListener('pointerenter', function () { stage.classList.add('is-tilting'); });
+    stage.addEventListener('pointermove', function (e) {
+      var rect = stage.getBoundingClientRect();
+      var relX = clamp((e.clientX - rect.left) / rect.width, 0, 1);
+      var relY = clamp((e.clientY - rect.top) / rect.height, 0, 1);
+      stage.style.setProperty('--rx', ((0.5 - relY) * 6).toFixed(2) + 'deg');
+      stage.style.setProperty('--ry', ((relX - 0.5) * 6).toFixed(2) + 'deg');
+      stage.style.setProperty('--mx', (relX * 100).toFixed(1) + '%');
+      stage.style.setProperty('--my', (relY * 100).toFixed(1) + '%');
+    });
+    stage.addEventListener('pointerleave', function () {
+      stage.classList.remove('is-tilting');
+      stage.style.setProperty('--rx', '0deg');
+      stage.style.setProperty('--ry', '0deg');
+    });
+  }
 
-      var newThumb = item.getAttribute('data-thumb');
-      var newTitle = item.getAttribute('data-title');
-      var newMeta = item.getAttribute('data-meta');
-      var newVideo = item.getAttribute('data-video');
+  /* 5. STICKY HORIZONTAL SHOWCASE (LANDO NORRIS / PASSIONFROOT RHYTHM) */
+  function initStickyShowcase() {
+    var section = document.getElementById('lavori');
+    var track = document.getElementById('showcaseTrack');
+    var counter = document.getElementById('showcaseCounter');
+    var fill = document.getElementById('showcaseProgress');
+    var cards = track ? track.querySelectorAll('.reel-card') : [];
+    if (!section || !track || !cards.length) return;
 
-      stage.setAttribute('data-video', newVideo);
-      stage.setAttribute('data-title', newTitle);
-      stage.setAttribute('aria-label', 'Riproduci ' + newTitle);
-      if (stageTitle) stageTitle.textContent = newTitle;
-      if (stageMeta) stageMeta.textContent = newMeta;
+    var totalCards = cards.length;
+    var currentX = 0;
+    var targetX = 0;
+    var rafId = null;
 
-      if (stageImg && stageImg.getAttribute('src') !== newThumb) {
-        stageImg.classList.add('is-swapping');
-        setTimeout(function () {
-          stageImg.src = newThumb;
-          stageImg.alt = newTitle;
-          stageImg.classList.remove('is-swapping');
-        }, 120);
+    function getMaxScroll() {
+      var viewportW = window.innerWidth;
+      var trackW = track.scrollWidth;
+      var padLeft = parseFloat(window.getComputedStyle(track.parentElement).paddingLeft) || 0;
+      return Math.max(0, trackW - (viewportW - padLeft));
+    }
+
+    function renderShowcase() {
+      if (window.innerWidth <= 980) {
+        track.style.transform = '';
+        rafId = null;
+        return;
+      }
+
+      currentX += (targetX - currentX) * (reduceMotion ? 1 : 0.12);
+      track.style.transform = 'translate3d(' + (-currentX).toFixed(1) + 'px, 0, 0)';
+
+      if (Math.abs(targetX - currentX) > 0.25) {
+        rafId = requestAnimationFrame(renderShowcase);
+      } else {
+        rafId = null;
       }
     }
 
-    items.forEach(function (item) {
-      item.addEventListener('mouseenter', function () { selectTrack(item); });
-      item.addEventListener('click', function () { selectTrack(item); });
-    });
+    function onScroll() {
+      if (window.innerWidth <= 980) {
+        track.style.transform = '';
+        return;
+      }
 
-    // Micro-tilt & luce radente solo su desktop con mouse
-    if (!reduceMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-      stage.addEventListener('pointerenter', function () { stage.classList.add('is-tilting'); });
-      stage.addEventListener('pointermove', function (e) {
-        var rect = stage.getBoundingClientRect();
-        var relX = clamp((e.clientX - rect.left) / rect.width, 0, 1);
-        var relY = clamp((e.clientY - rect.top) / rect.height, 0, 1);
-        stage.style.setProperty('--rx', ((0.5 - relY) * 7).toFixed(2) + 'deg');
-        stage.style.setProperty('--ry', ((relX - 0.5) * 7).toFixed(2) + 'deg');
-        stage.style.setProperty('--mx', (relX * 100).toFixed(1) + '%');
-        stage.style.setProperty('--my', (relY * 100).toFixed(1) + '%');
-      });
-      stage.addEventListener('pointerleave', function () {
-        stage.classList.remove('is-tilting');
-        stage.style.setProperty('--rx', '0deg');
-        stage.style.setProperty('--ry', '0deg');
-      });
+      var rect = section.getBoundingClientRect();
+      var scrollable = section.offsetHeight - window.innerHeight;
+      if (scrollable <= 0) return;
+
+      var progress = clamp(-rect.top / scrollable, 0, 1);
+      targetX = progress * getMaxScroll();
+
+      var activeIdx = clamp(Math.round(progress * (totalCards - 1)), 0, totalCards - 1);
+      if (counter) {
+        var numStr = activeIdx + 1 < 10 ? '0' + (activeIdx + 1) : String(activeIdx + 1);
+        var totStr = totalCards < 10 ? '0' + totalCards : String(totalCards);
+        counter.textContent = numStr + ' / ' + totStr;
+      }
+      if (fill) {
+        var pct = ((activeIdx + 1) / totalCards) * 100;
+        fill.style.width = pct.toFixed(1) + '%';
+      }
+
+      if (!rafId) rafId = requestAnimationFrame(renderShowcase);
     }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    onScroll();
   }
 
-  /* 5. CUSTOM CURSOR & AMBIENT GRADIENT */
+  /* 6. CUSTOM CURSOR & AMBIENT GRADIENT */
   function initCursor() {
     var cursor = document.querySelector('.cursor');
     if (!cursor || 'ontouchstart' in window) {
@@ -239,7 +270,7 @@
     }, { passive: true });
   }
 
-  /* 6. MOTION TABS DESKTOP & SCROLLSPY */
+  /* 7. MOTION TABS DESKTOP & SCROLLSPY */
   function updateBubble(bubble, target) {
     if (!bubble || !target) return;
     bubble.style.opacity = '1';
@@ -302,7 +333,7 @@
     }, { passive: true });
   }
 
-  /* 7. TIMELINE DESKTOP + SCRUBBER MOBILE (ANDROID FIX) */
+  /* 8. TIMELINE DESKTOP + SCRUBBER MOBILE (ANDROID FIX) */
   function initTimeline() {
     var workflow = document.getElementById('workflow');
     var track = document.getElementById('timelineTrack');
@@ -327,7 +358,6 @@
       steps.forEach(function (s, i) { s.classList.toggle('is-active', i === activeIdx); });
     }
 
-    // Mobile Scrubber
     if (track && pills.length) {
       pills.forEach(function (pill, idx) {
         pill.addEventListener('click', function () {
@@ -352,7 +382,7 @@
     updateDesktop();
   }
 
-  /* 8. LIGHTBOX YOUTUBE ON-DEMAND */
+  /* 9. LIGHTBOX YOUTUBE ON-DEMAND */
   function initLightbox() {
     var triggers = document.querySelectorAll('[data-video]');
     var lightbox = document.getElementById('lightbox');
@@ -394,16 +424,19 @@
     });
   }
 
-  /* 9. GAFFER TAPE PEEL-OFF (Touch-Friendly Android) */
+  /* 10. GAFFER TAPE PEEL-OFF (Animazione visibile anche su Android Touch) */
   function initPhoneReveal() {
     var btn = document.getElementById('phoneReveal');
     if (!btn) return;
     btn.addEventListener('click', function (e) {
       if (!btn.classList.contains('is-revealed')) {
         e.preventDefault();
-        btn.classList.add('is-revealed');
-        btn.setAttribute('aria-expanded', 'true');
-        if (navigator.vibrate) navigator.vibrate(15);
+        btn.classList.add('is-peeling');
+        if (navigator.vibrate) navigator.vibrate(18);
+        setTimeout(function () {
+          btn.classList.add('is-revealed');
+          btn.setAttribute('aria-expanded', 'true');
+        }, 120);
       }
     });
   }
@@ -413,6 +446,7 @@
     initLanguage();
     initThemeAndShake();
     initHeroStage();
+    initStickyShowcase();
     initCursor();
     initAmbientMotion();
     initMotionTabs();
