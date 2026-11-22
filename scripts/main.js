@@ -9,6 +9,10 @@
 
   function clamp(v, min, max) { return Math.min(Math.max(v, min), max); }
 
+  function setAmbientRGB(rgb) {
+    if (rgb) root.style.setProperty('--ambient-rgb', rgb);
+  }
+
   /* 1. NON-BLOCKING INTRO CURTAIN */
   function initIntroCurtain() {
     var curtain = document.getElementById('introCurtain');
@@ -117,13 +121,16 @@
     }
   }
 
-  /* 4. HERO STAGE MICRO-TILT (DESKTOP) */
+  /* 4. HERO STAGE MICRO-TILT + AMBIENT TINT */
   function initHeroStage() {
     var stage = document.getElementById('heroStage');
     if (!stage || reduceMotion) return;
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
-    stage.addEventListener('pointerenter', function () { stage.classList.add('is-tilting'); });
+    stage.addEventListener('pointerenter', function () {
+      stage.classList.add('is-tilting');
+      setAmbientRGB(stage.getAttribute('data-rgb'));
+    });
     stage.addEventListener('pointermove', function (e) {
       var rect = stage.getBoundingClientRect();
       var relX = clamp((e.clientX - rect.left) / rect.width, 0, 1);
@@ -137,22 +144,51 @@
       stage.classList.remove('is-tilting');
       stage.style.setProperty('--rx', '0deg');
       stage.style.setProperty('--ry', '0deg');
+      setAmbientRGB('143, 121, 230');
     });
   }
 
-  /* 5. STICKY HORIZONTAL SHOWCASE */
+  /* 5. STICKY HORIZONTAL SHOWCASE + DYNAMIC THUMBNAIL GRADIENT + MOBILE INFO TOGGLE */
   function initStickyShowcase() {
     var section = document.getElementById('lavori');
     var track = document.getElementById('showcaseTrack');
     var counter = document.getElementById('showcaseCounter');
+    var activeName = document.getElementById('showcaseActiveName');
     var fill = document.getElementById('showcaseProgress');
-    var cards = track ? track.querySelectorAll('.reel-card') : [];
+    var cards = track ? Array.from(track.querySelectorAll('.reel-card')) : [];
     if (!section || !track || !cards.length) return;
 
     var totalCards = cards.length;
     var currentX = 0;
     var targetX = 0;
+    var lastX = 0;
     var rafId = null;
+    var isHoveringCard = false;
+
+    // Hover colore dinamico per ogni card su desktop
+    cards.forEach(function (card) {
+      var rgb = card.getAttribute('data-rgb');
+      var label = card.getAttribute('data-label');
+      card.addEventListener('mouseenter', function () {
+        isHoveringCard = true;
+        setAmbientRGB(rgb);
+        if (activeName && label) activeName.textContent = label;
+      });
+      card.addEventListener('mouseleave', function () {
+        isHoveringCard = false;
+      });
+
+      // Toggle Info su smartphone
+      var infoBtn = card.querySelector('.reel-info-toggle');
+      if (infoBtn) {
+        infoBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var open = card.classList.toggle('is-info-open');
+          infoBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          infoBtn.textContent = open ? 'Chiudi' : 'Info';
+        });
+      }
+    });
 
     function getMaxScroll() {
       var viewportW = window.innerWidth;
@@ -167,14 +203,28 @@
         rafId = null;
         return;
       }
-      currentX += (targetX - currentX) * (reduceMotion ? 1 : 0.12);
-      track.style.transform = 'translate3d(' + (-currentX).toFixed(1) + 'px, 0, 0)';
-      if (Math.abs(targetX - currentX) > 0.25) rafId = requestAnimationFrame(renderShowcase);
-      else rafId = null;
+
+      currentX += (targetX - currentX) * (reduceMotion ? 1 : 0.11);
+      var velocity = clamp((targetX - currentX) * 0.015, -2.5, 2.5);
+      lastX = currentX;
+
+      track.style.transform =
+        'translate3d(' + (-currentX).toFixed(1) + 'px, 0, 0) skewX(' + (-velocity).toFixed(2) + 'deg)';
+
+      if (Math.abs(targetX - currentX) > 0.25) {
+        rafId = requestAnimationFrame(renderShowcase);
+      } else {
+        track.style.transform = 'translate3d(' + (-currentX).toFixed(1) + 'px, 0, 0)';
+        rafId = null;
+      }
     }
 
     function onScroll() {
-      if (window.innerWidth <= 980) { track.style.transform = ''; return; }
+      if (window.innerWidth <= 980) {
+        track.style.transform = '';
+        return;
+      }
+
       var rect = section.getBoundingClientRect();
       var scrollable = section.offsetHeight - window.innerHeight;
       if (scrollable <= 0) return;
@@ -183,12 +233,27 @@
       targetX = progress * getMaxScroll();
 
       var activeIdx = clamp(Math.round(progress * (totalCards - 1)), 0, totalCards - 1);
+      var activeCard = cards[activeIdx];
+
+      cards.forEach(function (c, i) { c.classList.toggle('is-current', i === activeIdx); });
+
       if (counter) {
         var numStr = activeIdx + 1 < 10 ? '0' + (activeIdx + 1) : String(activeIdx + 1);
         var totStr = totalCards < 10 ? '0' + totalCards : String(totalCards);
         counter.textContent = numStr + ' / ' + totStr;
       }
       if (fill) fill.style.width = (((activeIdx + 1) / totalCards) * 100).toFixed(1) + '%';
+
+      // Quando lo showcase è in vista e non si sta hoverando un'altra card, adatta il gradiente al progetto attivo
+      if (rect.top <= window.innerHeight * 0.4 && rect.bottom >= window.innerHeight * 0.4) {
+        if (!isHoveringCard && activeCard) {
+          setAmbientRGB(activeCard.getAttribute('data-rgb'));
+          if (activeName) activeName.textContent = activeCard.getAttribute('data-label') || '';
+        }
+      } else if (!isHoveringCard) {
+        setAmbientRGB('143, 121, 230');
+      }
+
       if (!rafId) rafId = requestAnimationFrame(renderShowcase);
     }
 
