@@ -75,7 +75,6 @@
       }
     }
 
-    // Attiva automaticamente su Android / browser senza permesso esplicito
     if ('DeviceMotionEvent' in window && typeof DeviceMotionEvent.requestPermission !== 'function') {
       enableShakeListener();
     }
@@ -186,118 +185,41 @@
     requestTick();
   }
 
-  /* 5. HERO 3D: MAGNETIC OBSIDIAN BLADES */
+  /* 5. HERO 3D EDITORIAL GRID — TILT INTERNO CONTROLLATO (SOLO DESKTOP) */
   function initHeroBlades() {
-    var container = document.getElementById('heroBlades');
-    if (!container) return;
-    var cards = Array.from(container.querySelectorAll('.blade-card'));
-    if (!cards.length) return;
+    var cards = document.querySelectorAll('#heroBlades .blade-card');
+    if (!cards.length || reduceMotion) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
-    var count = cards.length;
-    var activeIndex = 0;
-    var targetFocus = 0;
-    var currentFocus = 0;
-    var pointerX = 0; // -1 .. 1
-    var pointerY = 0; // -1 .. 1
-    var curPX = 0;
-    var curPY = 0;
-    var isHovering = false;
+    var maxTilt = 6; // Inclinazione elegante e controllata
 
-    function updateFocusedClass(idx) {
-      cards.forEach(function (card, i) {
-        card.classList.toggle('is-focused', i === idx);
-      });
-    }
-
-    function layoutBlades() {
-      var isMobile = window.innerWidth <= 600;
-      var spreadX = isMobile ? 34 : 58;
-      var spreadZ = isMobile ? 42 : 70;
-      var baseRotY = isMobile ? -14 : -22;
-
-      currentFocus += (targetFocus - currentFocus) * (reduceMotion ? 1 : 0.12);
-      curPX += (pointerX - curPX) * (reduceMotion ? 1 : 0.1);
-      curPY += (pointerY - curPY) * (reduceMotion ? 1 : 0.1);
-
-      cards.forEach(function (card, i) {
-        var delta = i - currentFocus;
-        var absDelta = Math.abs(delta);
-
-        // Repulsione magnetica: le lame si aprono attorno alla lama attiva
-        var fanPush = isHovering ? (delta * (isMobile ? 16 : 34)) : 0;
-        var tx = delta * spreadX + fanPush + curPX * (10 - absDelta * 1.5);
-        var ty = absDelta * (isMobile ? 6 : 10) + curPY * (8 - absDelta);
-        var tz = -absDelta * spreadZ + (absDelta < 0.5 ? 60 : 0);
-
-        var ry = delta === 0 ? curPX * 10 : (delta > 0 ? baseRotY : -baseRotY * 0.75) + curPX * 8;
-        var rx = -curPY * 8;
-        var scale = clamp(1 - absDelta * 0.08, 0.7, 1.04);
-        var opacity = clamp(1 - absDelta * 0.16, 0.32, 1);
-
-        card.style.transform =
-          'translate3d(' + tx.toFixed(1) + 'px, ' + ty.toFixed(1) + 'px, ' + tz.toFixed(1) + 'px) ' +
-          'rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) scale(' + scale.toFixed(3) + ')';
-        card.style.opacity = opacity.toFixed(2);
-        card.style.zIndex = String(Math.round(100 - absDelta * 10));
+    cards.forEach(function (card) {
+      card.addEventListener('pointerenter', function () {
+        card.classList.add('is-tilting');
       });
 
-      if (!reduceMotion) requestAnimationFrame(layoutBlades);
-    }
+      card.addEventListener('pointermove', function (e) {
+        var rect = card.getBoundingClientRect();
+        var relX = clamp((e.clientX - rect.left) / rect.width, 0, 1);
+        var relY = clamp((e.clientY - rect.top) / rect.height, 0, 1);
 
-    function handlePointer(clientX, clientY) {
-      var rect = container.getBoundingClientRect();
-      var relX = clamp((clientX - rect.left) / rect.width, 0, 1);
-      var relY = clamp((clientY - rect.top) / rect.height, 0, 1);
-      pointerX = (relX - 0.5) * 2;
-      pointerY = (relY - 0.5) * 2;
+        var rx = (0.5 - relY) * (maxTilt * 2);
+        var ry = (relX - 0.5) * (maxTilt * 2);
 
-      var idx = clamp(Math.floor(relX * count), 0, count - 1);
-      if (idx !== activeIndex) {
-        activeIndex = idx;
-        targetFocus = idx;
-        updateFocusedClass(activeIndex);
-      }
+        card.style.setProperty('--rx', rx.toFixed(2) + 'deg');
+        card.style.setProperty('--ry', ry.toFixed(2) + 'deg');
+        card.style.setProperty('--mx', (relX * 100).toFixed(1) + '%');
+        card.style.setProperty('--my', (relY * 100).toFixed(1) + '%');
+      });
 
-      // Aggiorna la rifrazione luminosa sulla lama attiva
-      var activeCard = cards[activeIndex];
-      if (activeCard) {
-        var cRect = activeCard.getBoundingClientRect();
-        var mx = clamp(((clientX - cRect.left) / cRect.width) * 100, 0, 100);
-        var my = clamp(((clientY - cRect.top) / cRect.height) * 100, 0, 100);
-        activeCard.style.setProperty('--mx', mx.toFixed(1) + '%');
-        activeCard.style.setProperty('--my', my.toFixed(1) + '%');
-      }
-    }
-
-    container.addEventListener('pointerenter', function () { isHovering = true; });
-    container.addEventListener('pointermove', function (e) {
-      isHovering = true;
-      handlePointer(e.clientX, e.clientY);
-    });
-    container.addEventListener('pointerleave', function () {
-      isHovering = false;
-      pointerX = 0;
-      pointerY = 0;
-    });
-
-    // Supporto scrubbing fluido su smartphone
-    container.addEventListener('touchmove', function (e) {
-      if (e.touches.length) {
-        isHovering = true;
-        handlePointer(e.touches[0].clientX, e.touches[0].clientY);
-      }
-    }, { passive: true });
-
-    cards.forEach(function (card, idx) {
-      card.addEventListener('focus', function () {
-        activeIndex = idx;
-        targetFocus = idx;
-        updateFocusedClass(activeIndex);
+      card.addEventListener('pointerleave', function () {
+        card.classList.remove('is-tilting');
+        card.style.setProperty('--rx', '0deg');
+        card.style.setProperty('--ry', '0deg');
+        card.style.setProperty('--mx', '50%');
+        card.style.setProperty('--my', '50%');
       });
     });
-
-    updateFocusedClass(0);
-    layoutBlades();
   }
 
   /* 6. REVEAL */
@@ -533,7 +455,7 @@
     });
   }
 
-  /* 11. PHONE PEEL-OFF (Primo clic rivela, secondo clic chiama) */
+  /* 11. PHONE PEEL-OFF */
   function initPhoneReveal() {
     var btn = document.querySelector('.phone-reveal');
     if (!btn) return;
